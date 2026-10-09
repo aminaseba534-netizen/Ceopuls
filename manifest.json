@@ -1,0 +1,8 @@
+{
+  "name": "CEO-Pulse",
+  "short_name": "CEO-Pulse",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a122a",
+  "theme_color": "#00e5ff"
+}

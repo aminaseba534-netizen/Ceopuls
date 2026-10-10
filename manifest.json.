@@ -1,0 +1,13 @@
+name": "CEO-Pulse Executive",
+  "short_name": "CEO-Pulse",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a122a",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://api.iconify.design/heroicons:shield-check-solid.svg?color=%2300e5ff",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"

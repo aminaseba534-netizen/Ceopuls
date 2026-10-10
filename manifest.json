@@ -1,5 +1,4 @@
-{
-  "name": "CEO-Pulse Executive",
+ "name": "CEO-Pulse Executive",
   "short_name": "CEO-Pulse",
   "start_url": "./index.html",
   "display": "standalone",
@@ -11,6 +10,3 @@
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
-    }
-  ]
-}

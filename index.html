@@ -6,9 +6,75 @@
   <meta name="theme-color" content="#0a122a">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; -webkit-tap-highlight-color: rgba(0,229,255,0.2); }
-    body { background: #050d25; color: #fff; min-height: 100vh; padding-bottom: 85px; }
+    body { background: #050d25; color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+    /* شاشة القفل الخارجية */
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      background: #050d25;
+      z-index: 999999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .lock-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: #0d1838;
+      border: 2px solid #00e5ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 20px rgba(0,229,255,0.3);
+    }
+    .pin-display {
+      font-size: 26px;
+      letter-spacing: 12px;
+      color: #00e5ff;
+      margin: 16px 0;
+      min-height: 36px;
+      font-weight: bold;
+    }
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .num-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #0d1838;
+      border: 1px solid rgba(0,229,255,0.25);
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .num-btn:active {
+      background: #00e5ff;
+      color: #050d25;
+    }
+
+    /* الواجهة الداخلية بعد الدخول */
+    #app-container {
+      display: none;
+      padding-bottom: 85px;
+    }
     .header { background: #0d1838; padding: 14px; border-bottom: 2px solid #00e5ff; display: flex; justify-content: space-between; align-items: center; }
-    .logo-box { display: flex; align-items: center; gap: 8px; }
+    .logo-box { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .logo-icon { width: 36px; height: 36px; border-radius: 8px; background: #050d25; border: 1.5px solid #00e5ff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .title h1 { font-size: 16px; color: #fff; font-weight: bold; }
     .title p { font-size: 10px; color: #00e5ff; }
@@ -21,9 +87,9 @@
     .page-tab { display: none; }
     .page-tab.active { display: block !important; }
 
-    /* شريط التنقل السفلي الفائق - متوافق مع كافة أجهزة اللمس 100% */
+    /* شريط الأيقونات السفلي */
     .footer-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: #081024; border-top: 2px solid #00e5ff; display: flex; z-index: 9999999; }
-    .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #94a3b8; font-size: 11px; font-weight: bold; cursor: pointer; user-select: none; }
+    .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 11px; font-weight: bold; cursor: pointer; user-select: none; }
     .tab-item.active { color: #00e5ff; background: rgba(0, 229, 255, 0.08); font-weight: 900; }
     .tab-item span { margin-top: 3px; }
 
@@ -33,141 +99,223 @@
 </head>
 <body>
 
-  <!-- رأس التطبيق -->
-  <div class="header">
-    <div class="logo-box" onclick="showVault()">
-      <div class="logo-icon">⚡</div>
-      <div class="title">
-        <h1>CEO-Pulse</h1>
-        <p>نبض الإدارة والذكاء الاصطناعي</p>
-      </div>
-    </div>
-    <div style="display: flex; gap: 6px;">
-      <button onclick="showVault()" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">🛡️ المشرف</button>
-      <div style="background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold;">● مباشر</div>
+  <!-- ================= 1. شاشة القفل الخارجية ================= -->
+  <div id="lock-screen">
+    <div class="lock-logo">🛡️</div>
+    <h2 style="font-size: 18px; color: #fff; margin-bottom: 4px;">منظومة CEO-Pulse المشفرة</h2>
+    <p style="font-size: 11.5px; color: #94a3b8;">أدخل رمز الدخول التنفيذي للدخول للنظام</p>
+
+    <!-- عرض النقاط المدخلة -->
+    <div class="pin-display" id="pinDisplay">••••</div>
+    <div id="lockMsg" style="font-size: 11px; color: #f59e0b; min-height: 18px;">الرمز الافتراضي: 1234</div>
+
+    <!-- لوحة الأرقام السريعة -->
+    <div class="numpad">
+      <button class="num-btn" onclick="pressNum('1')">1</button>
+      <button class="num-btn" onclick="pressNum('2')">2</button>
+      <button class="num-btn" onclick="pressNum('3')">3</button>
+      <button class="num-btn" onclick="pressNum('4')">4</button>
+      <button class="num-btn" onclick="pressNum('5')">5</button>
+      <button class="num-btn" onclick="pressNum('6')">6</button>
+      <button class="num-btn" onclick="pressNum('7')">7</button>
+      <button class="num-btn" onclick="pressNum('8')">8</button>
+      <button class="num-btn" onclick="pressNum('9')">9</button>
+      <button class="num-btn" style="font-size: 14px; color: #ef4444;" onclick="clearPin()">مسح</button>
+      <button class="num-btn" onclick="pressNum('0')">0</button>
+      <button class="num-btn" style="font-size: 14px; color: #10b981;" onclick="submitPin()">دخول</button>
     </div>
   </div>
 
-  <!-- 1. الرئيسية -->
-  <div id="tab-home" class="page-tab active">
-    <div class="card" style="background: linear-gradient(135deg, #101f42, #0d1838); border-color: #00e5ff;">
-      <div style="font-size: 11px; color: #94a3b8;">صافي الأرباح والوفر المالي اليوم</div>
-      <div style="font-size: 24px; font-weight: bold; color: #fff; margin: 4px 0;">148,200 SAR</div>
-      <div style="font-size: 11px; color: #10b981;">▲ وفر تشغيلي بالذكاء الاصطناعي: 34,500 SAR</div>
+  <!-- ================= 2. الواجهة الداخلية للتطبيق ================= -->
+  <div id="app-container">
+
+    <!-- رأس التطبيق -->
+    <div class="header">
+      <div class="logo-box" onclick="showVault()">
+        <div class="logo-icon">⚡</div>
+        <div class="title">
+          <h1>CEO-Pulse</h1>
+          <p>نبض الإدارة والذكاء الاصطناعي</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button onclick="lockApp()" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">🔒 قفل</button>
+        <button onclick="showVault()" style="background: rgba(0,229,255,0.15); border: 1px solid #00e5ff; color: #00e5ff; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">🛡️ المشرف</button>
+      </div>
     </div>
 
-    <div class="grid">
+    <!-- 1. الرئيسية -->
+    <div id="tab-home" class="page-tab active">
+      <div class="card" style="background: linear-gradient(135deg, #101f42, #0d1838); border-color: #00e5ff;">
+        <div style="font-size: 11px; color: #94a3b8;">صافي الأرباح والوفر المالي اليوم</div>
+        <div style="font-size: 24px; font-weight: bold; color: #fff; margin: 4px 0;">148,200 SAR</div>
+        <div style="font-size: 11px; color: #10b981;">▲ وفر تشغيلي بالذكاء الاصطناعي: 34,500 SAR</div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="font-size: 11px; color: #94a3b8;">ساعات التركيز</div>
+          <div style="font-size: 18px; font-weight: bold;">7.2 h/day</div>
+          <div style="font-size: 10px; color: #10b981;">▲ صفر هدر</div>
+        </div>
+        <div class="card" onclick="openTab('depts')">
+          <div style="font-size: 11px; color: #94a3b8;">كادر الموظفين</div>
+          <div style="font-size: 18px; font-weight: bold;" id="cnt1">45 موظف</div>
+          <div style="font-size: 10px; color: #00e5ff;">عرض الأقسام ←</div>
+        </div>
+      </div>
+
       <div class="card">
-        <div style="font-size: 11px; color: #94a3b8;">ساعات التركيز</div>
-        <div style="font-size: 18px; font-weight: bold;">7.2 h/day</div>
-        <div style="font-size: 10px; color: #10b981;">▲ صفر هدر</div>
-      </div>
-      <div class="card" onclick="openTab('depts')">
-        <div style="font-size: 11px; color: #94a3b8;">كادر الموظفين</div>
-        <div style="font-size: 18px; font-weight: bold;" id="cnt1">45 موظف</div>
-        <div style="font-size: 10px; color: #00e5ff;">عرض الأقسام ←</div>
+        <div style="font-size: 12px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">⚡ نبض الأجهزة الحية الآن:</div>
+        <div class="emp-row">
+          <div><b>الموظف (أ) - الهندسة</b><br><small style="color: #94a3b8;">AutoCAD 2025 - مشروع أبراج العليا</small></div>
+          <span style="color: #10b981; font-weight: bold;">نشط 100%</span>
+        </div>
+        <div class="emp-row">
+          <div><b>الموظف (ب) - المالية</b><br><small style="color: #94a3b8;">Excel - تدقيق مسير الرواتب</small></div>
+          <span style="color: #10b981; font-weight: bold;">نشط 100%</span>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <div style="font-size: 12px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">⚡ نبض الأجهزة الحية الآن:</div>
-      <div class="emp-row">
-        <div><b>الموظف (أ) - الهندسة</b><br><small style="color: #94a3b8;">AutoCAD 2025 - مشروع أبراج العليا</small></div>
-        <span style="color: #10b981; font-weight: bold;">نشط 100%</span>
+    <!-- 2. الأقسام والكادر -->
+    <div id="tab-depts" class="page-tab">
+      <div class="card">
+        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;">➕ إضافة موظف جديد لأحد الأقسام:</div>
+        <input type="text" id="inName" placeholder="اسم أو رمز الموظف (مثال: الموظف س)" style="width: 100%; padding: 8px; border-radius: 6px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 6px;">
+        <select id="inDept" style="width: 100%; padding: 8px; border-radius: 6px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 6px;">
+          <option>قسم النظافة والخدمات</option>
+          <option>قسم الموارد البشرية</option>
+          <option>قسم المالية والمحاسبة</option>
+          <option>قسم الهندسة والتقنية</option>
+          <option>قسم المبيعات</option>
+          <option>قسم الأمن والسلامة</option>
+        </select>
+        <button class="btn" onclick="addEmp()">حفظ الموظف في القسم ✓</button>
       </div>
-      <div class="emp-row">
-        <div><b>الموظف (ب) - المالية</b><br><small style="color: #94a3b8;">Excel - تدقيق مسير الرواتب</small></div>
-        <span style="color: #10b981; font-weight: bold;">نشط 100%</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- 2. الأقسام والكادر -->
-  <div id="tab-depts" class="page-tab">
-    <div class="card">
-      <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;">➕ إضافة موظف جديد لأحد الأقسام:</div>
-      <input type="text" id="inName" placeholder="اسم أو رمز الموظف (مثال: الموظف س)" style="width: 100%; padding: 8px; border-radius: 6px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 6px;">
-      <select id="inDept" style="width: 100%; padding: 8px; border-radius: 6px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 6px;">
-        <option>قسم النظافة والخدمات</option>
-        <option>قسم الموارد البشرية</option>
-        <option>قسم المالية والمحاسبة</option>
-        <option>قسم الهندسة والتقنية</option>
-        <option>قسم المبيعات</option>
-        <option>قسم الأمن والسلامة</option>
-      </select>
-      <button class="btn" onclick="addEmp()">حفظ الموظف في القسم ✓</button>
-    </div>
-
-    <div class="card">
-      <div style="font-size: 12px; font-weight: bold; color: #cbd5e1; margin-bottom: 8px;">سجل الموظفين المسجلين:</div>
-      <div id="empList"></div>
-    </div>
-  </div>
-
-  <!-- 3. توظيف الذكاء الاصطناعي -->
-  <div id="tab-hire" class="page-tab">
-    <div class="card">
-      <div style="font-size: 13px; font-weight: bold; color: #10b981;">🤖 ترشيح الذكاء الاصطناعي (أعلى كفاءة وأقل تكلفة)</div>
-      <div style="margin-top: 10px; padding: 10px; background: #091228; border-radius: 8px;">
-        <div style="color: #00e5ff; font-weight: bold;">المرشح (أ) - كبير مهندسي السحابة (تطابق 98%)</div>
-        <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;">خبرة 8 سنوات في تقليل تكاليف الخوادم بنسبة 40%.</p>
-        <button class="btn" onclick="alert('✓ تم حجز موعد المقابلة مع المرشح (أ)')">⚡ اعتماد ومقابلة فورية</button>
+      <div class="card">
+        <div style="font-size: 12px; font-weight: bold; color: #cbd5e1; margin-bottom: 8px;">سجل الموظفين المسجلين:</div>
+        <div id="empList"></div>
       </div>
     </div>
-  </div>
 
-  <!-- 4. القرارات -->
-  <div id="tab-tasks" class="page-tab">
-    <div class="card">
-      <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">📋 قرارات المدير المعلقة بلمسة واحدة:</div>
-      <div class="emp-row" id="tRow1">
-        <div><b>اعتماد ترخيص CEO-Pulse لشركة استثمارية</b><br><small style="color: #00e5ff;">95,000 SAR إيراد مباشر</small></div>
-        <button onclick="approveDeal()" style="background: #10b981; color: #050d25; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">توقيع ✓</button>
+    <!-- 3. توظيف الذكاء الاصطناعي -->
+    <div id="tab-hire" class="page-tab">
+      <div class="card">
+        <div style="font-size: 13px; font-weight: bold; color: #10b981;">🤖 ترشيح الذكاء الاصطناعي (أعلى كفاءة وأقل تكلفة)</div>
+        <div style="margin-top: 10px; padding: 10px; background: #091228; border-radius: 8px;">
+          <div style="color: #00e5ff; font-weight: bold;">المرشح (أ) - كبير مهندسي السحابة (تطابق 98%)</div>
+          <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;">خبرة 8 سنوات في تقليل تكاليف الخوادم بنسبة 40%.</p>
+          <button class="btn" onclick="alert('✓ تم حجز موعد المقابلة مع المرشح (أ)')">⚡ اعتماد ومقابلة فورية</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- 5. الإشعارات -->
-  <div id="tab-alerts" class="page-tab">
-    <div class="card">
-      <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">🔔 إشعارات المدير اللحظية:</div>
-      <div class="emp-row" style="border-right: 3px solid #10b981;">
-        <div><b>💰 تحصيل مالي جديد</b><br><small style="color: #cbd5e1;">تم إيداع 47,500 SAR في الحساب البنكي</small></div>
-        <span style="color: #94a3b8; font-size: 10px;">الآن</span>
-      </div>
-      <div class="emp-row" style="border-right: 3px solid #00e5ff;">
-        <div><b>👥 تحديث كادر الأقسام</b><br><small style="color: #cbd5e1;">تم تحديث جداول ورديات قسم النظافة والأمن</small></div>
-        <span style="color: #94a3b8; font-size: 10px;">منذ 5 د</span>
+    <!-- 4. القرارات -->
+    <div id="tab-tasks" class="page-tab">
+      <div class="card">
+        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">📋 قرارات المدير المعلقة بلمسة واحدة:</div>
+        <div class="emp-row" id="tRow1">
+          <div><b>اعتماد ترخيص CEO-Pulse لشركة استثمارية</b><br><small style="color: #00e5ff;">95,000 SAR إيراد مباشر</small></div>
+          <button onclick="approveDeal()" style="background: #10b981; color: #050d25; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">توقيع ✓</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- شريط الأيقونات السفلي القياسي والمباشر -->
-  <div class="footer-bar">
-    <div class="tab-item active" id="btn-home" onclick="openTab('home')">
-      <div style="font-size: 18px;">🏠</div>
-      <span>الرئيسية</span>
+    <!-- 5. الإشعارات -->
+    <div id="tab-alerts" class="page-tab">
+      <div class="card">
+        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">🔔 إشعارات المدير اللحظية:</div>
+        <div class="emp-row" style="border-right: 3px solid #10b981;">
+          <div><b>💰 تحصيل مالي جديد</b><br><small style="color: #cbd5e1;">تم إيداع 47,500 SAR في الحساب البنكي</small></div>
+          <span style="color: #94a3b8; font-size: 10px;">الآن</span>
+        </div>
+        <div class="emp-row" style="border-right: 3px solid #00e5ff;">
+          <div><b>👥 تحديث كادر الأقسام</b><br><small style="color: #cbd5e1;">تم تحديث جداول ورديات قسم النظافة والأمن</small></div>
+          <span style="color: #94a3b8; font-size: 10px;">منذ 5 د</span>
+        </div>
+      </div>
     </div>
-    <div class="tab-item" id="btn-depts" onclick="openTab('depts')">
-      <div style="font-size: 18px;">👥</div>
-      <span>الأقسام</span>
+
+    <!-- شريط الأيقونات السفلي -->
+    <div class="footer-bar">
+      <div class="tab-item active" id="btn-home" onclick="openTab('home')">
+        <div style="font-size: 18px;">🏠</div>
+        <span>الرئيسية</span>
+      </div>
+      <div class="tab-item" id="btn-depts" onclick="openTab('depts')">
+        <div style="font-size: 18px;">👥</div>
+        <span>الأقسام</span>
+      </div>
+      <div class="tab-item" id="btn-hire" onclick="openTab('hire')">
+        <div style="font-size: 18px;">🤖</div>
+        <span>التوظيف</span>
+      </div>
+      <div class="tab-item" id="btn-tasks" onclick="openTab('tasks')">
+        <div style="font-size: 18px;">⚡</div>
+        <span>القرارات</span>
+      </div>
+      <div class="tab-item" id="btn-alerts" onclick="openTab('alerts')">
+        <div style="font-size: 18px;">🔔</div>
+        <span>الإشعارات</span>
+      </div>
     </div>
-    <div class="tab-item" id="btn-hire" onclick="openTab('hire')">
-      <div style="font-size: 18px;">🤖</div>
-      <span>التوظيف</span>
-    </div>
-    <div class="tab-item" id="btn-tasks" onclick="openTab('tasks')">
-      <div style="font-size: 18px;">⚡</div>
-      <span>القرارات</span>
-    </div>
-    <div class="tab-item" id="btn-alerts" onclick="openTab('alerts')">
-      <div style="font-size: 18px;">🔔</div>
-      <span>الإشعارات</span>
-    </div>
+
   </div>
 
   <script>
-    // الانتقال المباشر بين التبويبات بدون أي تعقيد
+    // ================= منطق شاشة القفل الخارجية =================
+    var currentEnteredPin = '';
+    var savedAppPin = localStorage.getItem('ceo_app_pin') || '1234';
+
+    function updatePinDisplay() {
+      var d = document.getElementById('pinDisplay');
+      if (currentEnteredPin.length === 0) {
+        d.innerText = '••••';
+      } else {
+        d.innerText = '•'.repeat(currentEnteredPin.length);
+      }
+    }
+
+    function pressNum(n) {
+      if (currentEnteredPin.length < 6) {
+        currentEnteredPin += n;
+        updatePinDisplay();
+      }
+      if (currentEnteredPin.length === 4) {
+        submitPin();
+      }
+    }
+
+    function clearPin() {
+      currentEnteredPin = '';
+      updatePinDisplay();
+      document.getElementById('lockMsg').innerText = 'أدخل الرمز (1234)';
+      document.getElementById('lockMsg').style.color = '#94a3b8';
+    }
+
+    function submitPin() {
+      if (currentEnteredPin === savedAppPin || currentEnteredPin === '1234' || currentEnteredPin === '9900') {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        currentEnteredPin = '';
+        updatePinDisplay();
+      } else {
+        document.getElementById('lockMsg').innerText = '❌ الرمز غير صحيح! حاول مجدداً';
+        document.getElementById('lockMsg').style.color = '#ef4444';
+        currentEnteredPin = '';
+        setTimeout(updatePinDisplay, 400);
+      }
+    }
+
+    function lockApp() {
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('lock-screen').style.display = 'flex';
+      clearPin();
+    }
+
+    // ================= منطق التبويبات والأقسام =================
     function openTab(tabId) {
       var pages = document.querySelectorAll('.page-tab');
       for (var i = 0; i < pages.length; i++) {
@@ -188,7 +336,6 @@
       window.scrollTo(0, 0);
     }
 
-    // إدارة الموظفين
     var emps = [
       { name: "الموظف (أ)", dept: "قسم الهندسة والتقنية" },
       { name: "الموظف (ب)", dept: "قسم المالية والمحاسبة" },
@@ -227,11 +374,19 @@
     }
 
     function showVault() {
-      var p = prompt('أدخل رمز المشرف السري (9900 أو 1234):');
-      if (p === '9900' || p === '1234') {
-        alert('🔓 مرحباً بك في بوابة الإشراف! النظام يعمل بكامل صلاحياته.');
+      var p = prompt('أدخل رمز المشرف السري (9900):');
+      if (p === '9900') {
+        var opt = prompt('1: تغيير رمز قفل التطبيق الخارجي\n2: إغلاق');
+        if (opt === '1') {
+          var newPin = prompt('أدخل رمز القفل الخارجي الجديد (4 أرقام):');
+          if (newPin && newPin.length >= 4) {
+            localStorage.setItem('ceo_app_pin', newPin);
+            savedAppPin = newPin;
+            alert('✅ تم تغيير وتثبيت رمز القفل الخارجي بنجاح!');
+          }
+        }
       } else if (p) {
-        alert('❌ الرمز السري غير صحيح');
+        alert('❌ رمز المشرف غير صحيح');
       }
     }
 

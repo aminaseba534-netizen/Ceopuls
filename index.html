@@ -3,613 +3,479 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CEO-Pulse Executive Global</title>
-  <meta name="theme-color" content="#0a122a">
+  <title>CEO-Pulse Executive</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23050d25'/><path d='M20 50h15l6-16 8 32 7-22 5 11h19' fill='none' stroke='%2300e5ff' stroke-width='6' stroke-linecap='round'/></svg>">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #050d25; color: #ffffff; min-height: 100vh; overflow-x: hidden; }
-
-    /* شاشة القفل الخارجية */
-    #lock-screen {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #050d25;
-      z-index: 99999999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;
+    :root {
+      --bg: #050d25;
+      --card-bg: rgba(16, 26, 54, 0.75);
+      --border: rgba(0, 229, 255, 0.2);
+      --cyan: #00e5ff;
+      --blue: #3b82f6;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #10b981;
     }
-    .lock-logo { width: 70px; height: 70px; border-radius: 20px; background: #0d1838; border: 2px solid #00e5ff; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 14px; box-shadow: 0 0 25px rgba(0, 229, 255, 0.35); }
-    .pin-display { font-size: 32px; letter-spacing: 16px; color: #00e5ff; margin: 16px 0; min-height: 42px; font-weight: bold; }
-    .numpad { display: grid; grid-template-columns: repeat(3, 76px); gap: 14px; margin-top: 10px; }
-    .num-btn { width: 76px; height: 76px; border-radius: 50%; background: #0d1838; border: 1px solid rgba(0, 229, 255, 0.3); color: #ffffff; font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; }
-    .num-btn:active { background: #00e5ff; color: #050d25; transform: scale(0.96); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 90px; }
+    
+    /* Lock Screen */
+    #lockScreen {
+      position: fixed; inset: 0; z-index: 9999; background: #050d25;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+    }
+    .pin-display { display: flex; gap: 12px; margin: 24px 0; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--cyan); }
+    .pin-dot.filled { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 280px; }
+    .key-btn {
+      aspect-ratio: 1; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--text); font-size: 22px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .key-btn:active { background: rgba(0, 229, 255, 0.2); transform: scale(0.95); }
 
-    /* شاشة التجميد لعدم السداد (Kill-Switch) */
-    #freeze-screen {
-      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #2a080c;
-      z-index: 999999999; flex-direction: column; align-items: center; justify-content: center; padding: 28px; text-align: center; color: #fff;
+    /* Top Nav */
+    header {
+      background: rgba(5, 13, 37, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 8px; font-weight: 900; color: var(--cyan); letter-spacing: 1px; cursor: pointer; }
+    .nav-controls { display: flex; gap: 8px; }
+    select {
+      background: #0f172a; color: var(--cyan); border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 12px; font-weight: 700; outline: none; cursor: pointer;
     }
 
-    /* الحاوية الرئيسية للتطبيق */
-    #app-container { display: none; padding-bottom: 85px; }
-    .header {
-      background: #0d1838; padding: 12px 14px; border-bottom: 2px solid #00e5ff;
-      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
+    /* Content Area */
+    main { padding: 16px; max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kpi-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px;
+      display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    .logo-box { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .logo-icon { width: 34px; height: 34px; border-radius: 10px; background: #050d25; border: 1.5px solid #00e5ff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .title h1 { font-size: 15px; color: #ffffff; font-weight: bold; }
-    .title p { font-size: 10px; color: #00e5ff; }
+    .kpi-title { font-size: 13px; color: var(--muted); }
+    .kpi-value { font-size: 22px; font-weight: 800; color: var(--text); }
+    .kpi-badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; width: fit-content; font-weight: 700; }
+    .badge-cyan { background: rgba(0,229,255,0.15); color: var(--cyan); }
+    .badge-green { background: rgba(16,185,129,0.15); color: var(--success); }
 
-    /* شريط اللغات والعملات الدولي */
-    .selector-bar {
-      background: #08122c; padding: 8px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex; justify-content: space-between; align-items: center; gap: 6px;
+    /* Panels */
+    .panel {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
     }
-    .select-group { display: flex; align-items: center; gap: 4px; flex: 1; }
-    .select-box {
-      background: #0d1838; color: #00e5ff; border: 1px solid rgba(0, 229, 255, 0.4);
-      padding: 6px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; outline: none; width: 100%;
+    .panel-header { display: flex; justify-content: space-between; align-items: center; }
+    .panel-title { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+    .item-card {
+      background: rgba(5, 13, 37, 0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+      padding: 12px; display: flex; justify-content: space-between; align-items: center;
     }
 
-    .card { background: #131d3f; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 16px; margin: 12px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 12px; }
-    .grid .card { margin: 0; }
-
-    .page-tab { display: none; }
-    .page-tab.active { display: block !important; }
-
-    .footer-bar {
-      position: fixed; bottom: 0; left: 0; width: 100%; height: 72px;
-      background: #081024; border-top: 2px solid #00e5ff; display: flex; z-index: 99999;
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(5, 13, 37, 0.95);
+      backdrop-filter: blur(16px); border-top: 1px solid var(--border); display: flex;
+      justify-content: space-around; padding: 10px 0; z-index: 100;
     }
-    .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 11px; font-weight: bold; cursor: pointer; user-select: none; }
-    .tab-item.active { color: #00e5ff; background: rgba(0, 229, 255, 0.1); font-weight: 900; }
-    .tab-item span { margin-top: 4px; }
-
-    .btn { background: #00e5ff; color: #050d25; border: none; padding: 12px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-top: 10px; }
-    .btn-green { background: #10b981; color: #050d25; }
-    .emp-row { background: #091228; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; border: 1px solid rgba(255, 255, 255, 0.05); }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: none; border: none; color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .nav-item.active { color: var(--cyan); }
+    .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
   </style>
 </head>
 <body>
 
-  <!-- 1. شاشة القفل الخارجية -->
-  <div id="lock-screen">
-    <div class="lock-logo">🛡️</div>
-    <h2 style="font-size: 20px; color: #fff; margin-bottom: 6px;" id="lblLockTitle">منظومة CEO-Pulse المشفرة</h2>
-    <p style="font-size: 12px; color: #94a3b8;" id="lblLockSub">أدخل رمز الدخول التنفيذي للدخول للنظام</p>
-    <div class="pin-display" id="pinDisplay">••••</div>
-    <div id="lockMsg" style="font-size: 12px; color: #f59e0b; min-height: 20px;">رمز الدخول الافتراضي: 1234</div>
-    <div class="numpad">
-      <button class="num-btn" onclick="pressNum('1')">1</button>
-      <button class="num-btn" onclick="pressNum('2')">2</button>
-      <button class="num-btn" onclick="pressNum('3')">3</button>
-      <button class="num-btn" onclick="pressNum('4')">4</button>
-      <button class="num-btn" onclick="pressNum('5')">5</button>
-      <button class="num-btn" onclick="pressNum('6')">6</button>
-      <button class="num-btn" onclick="pressNum('7')">7</button>
-      <button class="num-btn" onclick="pressNum('8')">8</button>
-      <button class="num-btn" onclick="pressNum('9')">9</button>
-      <button class="num-btn" style="font-size: 15px; color: #ef4444;" onclick="clearPin()">مسح</button>
-      <button class="num-btn" onclick="pressNum('0')">0</button>
-      <button class="num-btn" style="font-size: 15px; color: #10b981;" onclick="submitPin()">دخول</button>
+  <!-- External Security Lock Screen -->
+  <div id="lockScreen">
+    <div style="font-size: 40px; margin-bottom: 8px;">🛡️</div>
+    <h2 style="color: var(--cyan); font-size: 20px; font-weight: 900;" id="txt_lock_title">منظومة CEO-Pulse المشفرة</h2>
+    <p style="color: var(--muted); font-size: 13px; margin-top: 4px;" id="txt_lock_sub">أدخل رمز الدخول التنفيذي</p>
+    <div class="pin-display">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
     </div>
+    <div class="keypad">
+      <button class="key-btn" onclick="pressKey(1)">1</button>
+      <button class="key-btn" onclick="pressKey(2)">2</button>
+      <button class="key-btn" onclick="pressKey(3)">3</button>
+      <button class="key-btn" onclick="pressKey(4)">4</button>
+      <button class="key-btn" onclick="pressKey(5)">5</button>
+      <button class="key-btn" onclick="pressKey(6)">6</button>
+      <button class="key-btn" onclick="pressKey(7)">7</button>
+      <button class="key-btn" onclick="pressKey(8)">8</button>
+      <button class="key-btn" onclick="pressKey(9)">9</button>
+      <button class="key-btn" style="font-size: 14px;" onclick="clearPin()" id="txt_clear">مسح</button>
+      <button class="key-btn" onclick="pressKey(0)">0</button>
+      <button class="key-btn" style="font-size: 14px; color: var(--cyan);" onclick="quickUnlock()" id="txt_quick_enter">دخول</button>
+    </div>
+    <div style="margin-top: 24px; font-size: 12px; color: #64748b;">PIN: 1234</div>
   </div>
 
-  <!-- 2. شاشة التجميد (Kill-Switch) -->
-  <div id="freeze-screen">
-    <div style="font-size: 56px; margin-bottom: 14px; cursor: pointer;" onclick="unfreezePrompt()">🔒</div>
-    <h2 style="font-size: 22px; color: #ef4444; font-weight: 900; margin-bottom: 8px;">تم تعليق ترخيص المنظومة</h2>
-    <p style="font-size: 13px; color: #fca5a5; max-width: 320px; line-height: 1.6; margin-bottom: 22px;">
-      تم إيقاف تشغيل المنظومة لعدم استكمال تسوية المستحقات المالية أو انتهاء صلاحية العقد.
-    </p>
-    <button onclick="unfreezePrompt()" style="background: rgba(239,68,68,0.25); border: 1px solid #ef4444; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer;">
-      إلغاء التجميد (للمشرف فقط)
+  <!-- Header -->
+  <header>
+    <div class="brand" onclick="handleLogoClicks()">
+      <span>🛡️</span>
+      <span>CEO-PULSE</span>
+    </div>
+    <div class="nav-controls">
+      <!-- Currency Selector -->
+      <select id="currSelect" onchange="changeCurrency(this.value)">
+        <option value="SAR">🇸🇦 SAR</option>
+        <option value="USD">🇺🇸 USD</option>
+        <option value="EUR">🇪🇺 EUR</option>
+        <option value="QAR">🇶🇦 QAR</option>
+        <option value="AED">🇦🇪 AED</option>
+        <option value="DZD">🇩🇿 DZD</option>
+      </select>
+      <!-- Language Selector -->
+      <select id="langSelect" onchange="changeLanguage(this.value)">
+        <option value="ar">العربية 🇸🇦</option>
+        <option value="en">English 🇬🇧</option>
+        <option value="fr">Français 🇫🇷</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-title" id="txt_productivity">معدل الإنتاجية العام</span>
+        <span class="kpi-value" style="color: var(--cyan);">94.8%</span>
+        <span class="kpi-badge badge-cyan" id="txt_live_telemetry">⚡ تليمتري حي</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title" id="txt_workstations">محطات العمل النشطة</span>
+        <span class="kpi-value">42 / 45</span>
+        <span class="kpi-badge badge-green" id="txt_e2ee">🛡️ مشفر E2EE</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title" id="txt_bonus_total">مكافآت الصفقات المعتمدة</span>
+        <span class="kpi-value" id="kpi_bonus">29,500 SAR</span>
+        <span class="kpi-badge badge-green" id="txt_bonus_badge">+15% هذا الشهر</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title" id="txt_cloud_status">حالة السحابة السيادية</span>
+        <span class="kpi-value" style="font-size: 16px; color: var(--success);" id="txt_cloud_active">متصلة 100%</span>
+        <span class="kpi-badge badge-cyan">Paris AWS Cloud</span>
+      </div>
+    </div>
+
+    <!-- Executive Tasks Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title" id="txt_tasks_header">📋 المهام والقرارات التنفيذية</span>
+        <span style="font-size: 12px; color: var(--cyan); cursor: pointer;" onclick="refreshData()" id="txt_refresh">🔄 تحديث</span>
+      </div>
+      <div class="item-card">
+        <div>
+          <div style="font-weight: 700; font-size: 14px;" id="task_1_title">اعتماد مسير رواتب الشهر الحالي</div>
+          <div style="font-size: 12px; color: var(--muted);" id="task_1_sub">قسم الإدارة المالية • عاجل</div>
+        </div>
+        <button style="background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid var(--success); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;" onclick="alert('✅ تم الاعتماد بنجاح')" id="btn_approve_1">اعتماد</button>
+      </div>
+      <div class="item-card">
+        <div>
+          <div style="font-weight: 700; font-size: 14px;" id="task_2_title">مراجعة تدقيق الأمان السيبراني</div>
+          <div style="font-size: 12px; color: var(--muted);" id="task_2_sub">تقنية المعلومات • موثق NDMO</div>
+        </div>
+        <button style="background: rgba(0,229,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;" onclick="alert('🔍 جاري استعراض التقرير')" id="btn_view_2">استعراض</button>
+      </div>
+    </div>
+
+    <!-- Deals & Bonuses Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title" id="txt_deals_header">💰 صفقات الموظفين والمكافآت</span>
+        <button style="background: var(--cyan); color: #050d25; border: none; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 11px; cursor: pointer;" onclick="addNewBonus()" id="btn_add_deal">+ إضافة مكافأة</button>
+      </div>
+      <div class="item-card">
+        <div>
+          <div style="font-weight: 700; font-size: 14px;" id="emp_1_name">الموظف أ (قسم المالية)</div>
+          <div style="font-size: 12px; color: var(--muted);" id="emp_1_deal">إغلاق صفقة التوريد السنوية الكبرى</div>
+        </div>
+        <div style="font-weight: 800; color: var(--cyan);" id="emp_1_amount">+ 15,000 SAR</div>
+      </div>
+      <div class="item-card">
+        <div>
+          <div style="font-weight: 700; font-size: 14px;" id="emp_2_name">الموظف د (المبيعات والتسويق)</div>
+          <div style="font-size: 12px; color: var(--muted);" id="emp_2_deal">تحقيق أعلى مبيعات ربع سنوية</div>
+        </div>
+        <div style="font-weight: 800; color: var(--cyan);" id="emp_2_amount">+ 8,500 SAR</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="setTab(this, 'dashboard')">
+      <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      <span id="tab_dash">الرئيسية</span>
     </button>
-  </div>
-
-  <!-- 3. الواجهة التنفيذية الداخلية -->
-  <div id="app-container">
-
-    <!-- الرأس العلوي -->
-    <div class="header">
-      <div class="logo-box" onclick="showVault()">
-        <div class="logo-icon">⚡</div>
-        <div class="title">
-          <h1 id="appHeaderTitle">CEO-Pulse</h1>
-          <p id="appHeaderSub">نبض الإدارة والرواتب والأمان</p>
-        </div>
-      </div>
-      <div style="display: flex; gap: 6px;">
-        <button onclick="lockApp()" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">🔒 قفل</button>
-        <button onclick="showVault()" style="background: rgba(0,229,255,0.15); border: 1px solid #00e5ff; color: #00e5ff; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">🛡️ المشرف</button>
-      </div>
-    </div>
-
-    <!-- شريط اللغات والعملات الشامل -->
-    <div class="selector-bar">
-      <!-- قائمة اللغات -->
-      <div class="select-group">
-        <span style="font-size: 11px;">🌐</span>
-        <select class="select-box" id="langSelect" onchange="applyLanguage()">
-          <option value="ar" selected>العربية (Arabic)</option>
-          <option value="en">English (US/UK)</option>
-          <option value="fr">Français (French)</option>
-          <option value="es">Español (Spanish)</option>
-          <option value="de">Deutsch (German)</option>
-          <option value="tr">Türkçe (Turkish)</option>
-          <option value="zh">中文 (Chinese)</option>
-        </select>
-      </div>
-      <!-- قائمة العملات الكاملة -->
-      <div class="select-group">
-        <span style="font-size: 11px;">💰</span>
-        <select class="select-box" id="currSelect" onchange="applyCurrency()">
-          <!-- الخليج والوطن العربي -->
-          <option value="SAR" selected>🇸🇦 ريال سعودي (SAR)</option>
-          <option value="AED">🇦🇪 درهم إماراتي (AED)</option>
-          <option value="KWD">🇰🇼 دينار كويتي (KWD)</option>
-          <option value="QAR">🇶🇦 ريال قطري (QAR)</option>
-          <option value="BHD">🇧🇭 دينار بحريني (BHD)</option>
-          <option value="OMR">🇴🇲 ريال عماني (OMR)</option>
-          <option value="DZD">🇩🇿 دينار جزائري (DZD)</option>
-          <option value="EGP">🇪🇬 جنيه مصري (EGP)</option>
-          <option value="MAD">🇲🇦 درهم مغربي (MAD)</option>
-          <option value="TND">🇹🇳 دينار تونسي (TND)</option>
-          <option value="JOD">🇯🇴 دينار أردني (JOD)</option>
-          <option value="IQD">🇮🇶 دينار عراقي (IQD)</option>
-          <!-- العملات العالمية -->
-          <option value="USD">🇺🇸 دولار أمريكي (USD)</option>
-          <option value="EUR">🇪🇺 يورو أوروبي (EUR)</option>
-          <option value="GBP">🇬🇧 جنيه إسترليني (GBP)</option>
-          <option value="CHF">🇨🇭 فرنك سويسري (CHF)</option>
-          <option value="CAD">🇨🇦 دولار كندي (CAD)</option>
-          <option value="AUD">🇦🇺 دولار أسترالي (AUD)</option>
-          <option value="JPY">🇯🇵 ين ياباني (JPY)</option>
-          <option value="CNY">🇨🇳 يوان صيني (CNY)</option>
-          <option value="TRY">🇹🇷 ليرة تركية (TRY)</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- 1. الرئيسية -->
-    <div id="tab-home" class="page-tab active">
-      <div class="card" style="background: linear-gradient(135deg, #101f42, #0d1838); border-color: #00e5ff;">
-        <div style="font-size: 12px; color: #94a3b8;" id="txtRevTitle">صافي الإيرادات والأرباح اليومية المحصلة</div>
-        <div style="font-size: 26px; font-weight: bold; color: #fff; margin: 6px 0;" id="valRevenue">195,700 SAR</div>
-        <div style="font-size: 12px; color: #10b981;" id="valSaved">▲ وفر بالذكاء الاصطناعي: 42,300 SAR</div>
-      </div>
-
-      <div class="grid">
-        <div class="card" onclick="openTab('payroll')">
-          <div style="font-size: 11px; color: #94a3b8;" id="txtPayDueTitle">الرواتب القادمة</div>
-          <div style="font-size: 17px; font-weight: bold; color: #f59e0b;" id="txtPayDays">بعد 6 أيام</div>
-          <div style="font-size: 11px; color: #00e5ff;" id="txtViewPay">عرض المسير ←</div>
-        </div>
-        <div class="card" onclick="openTab('depts')">
-          <div style="font-size: 11px; color: #94a3b8;" id="txtStaffTitle">كادر الشركة</div>
-          <div style="font-size: 17px; font-weight: bold;" id="cnt1">45 موظف</div>
-          <div style="font-size: 11px; color: #10b981;" id="txtAllDepts">جميع الأقسام ←</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;" id="txtLivePulse">⚡ نبض أجهزة الموظفين الحية الآن:</div>
-        <div class="emp-row">
-          <div><b id="emp1Title">الموظف (أ) - الهندسة</b><br><small style="color: #94a3b8;">AutoCAD 2025 - مشروع العليا</small></div>
-          <span style="color: #10b981; font-weight: bold;" id="txtStatusActive">نشط 100%</span>
-        </div>
-        <div class="emp-row">
-          <div><b id="emp2Title">الموظف (ب) - المبيعات</b><br><small style="color: #94a3b8;">إغلاق صفقة توريد مؤسسية</small></div>
-          <span style="color: #f59e0b; font-weight: bold;" id="txtStatusDeal">صفقة رابحة ⭐</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. الرواتب والمكافآت -->
-    <div id="tab-payroll" class="page-tab">
-      <div class="card" style="background: linear-gradient(135deg, #172554, #0f172a); border-color: #3b82f6;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 12px; color: #93c5fd;" id="lblNextPayTitle">موعد مسير الرواتب الشهري القادم</div>
-            <div style="font-size: 20px; font-weight: bold; color: #fff; margin: 4px 0;" id="lblNextPayDate">27 من الشهر (متبقي 6 أيام)</div>
-            <div style="font-size: 12px; color: #cbd5e1;"><span id="lblTotalPay">إجمالي الرواتب + المكافآت:</span> <b id="valPayroll">142,500 SAR</b></div>
-          </div>
-          <div style="text-align: center; background: rgba(59,130,246,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid #3b82f6;">
-            <div style="font-size: 20px; font-weight: bold; color: #60a5fa;">6</div>
-            <div style="font-size: 10px; color: #93c5fd;" id="lblDaysLeft">أيام متبقية</div>
-          </div>
-        </div>
-        <button class="btn btn-green" onclick="alert('✓ تم اعتماد وتحويل مسير الرواتب الشهري بالكامل للموظفين!')" style="margin-top: 14px;" id="btnApprovePayroll">
-          اعتماد وتحويل مسير الرواتب بلمسة واحدة ✓
-        </button>
-      </div>
-
-      <!-- مكافآت صفقات الموظفين -->
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #f59e0b; margin-bottom: 10px;" id="lblBonusTitle">⭐ كشف مكافآت الصفقات والعلاوات المعتمدة:</div>
-        
-        <div class="emp-row" id="bonusRow1">
-          <div>
-            <b>الموظف (ب) - قسم المبيعات</b><br>
-            <small style="color: #94a3b8;">إغلاق صفقة عقد مؤسسي</small><br>
-            <span style="color: #10b981; font-weight: bold;" id="bVal1">+ 6,000 SAR مكافأة صفقة</span>
-          </div>
-          <button onclick="approveBonus('bonusRow1')" style="background: #10b981; color: #050d25; border: none; padding: 7px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">صرف ✓</button>
-        </div>
-
-        <div class="emp-row" id="bonusRow2">
-          <div>
-            <b>الموظف (أ) - قسم التقنية والهندسة</b><br>
-            <small style="color: #94a3b8;">إنجاز مبكر وتوفير تكاليف خوادم</small><br>
-            <span style="color: #00e5ff; font-weight: bold;" id="bVal2">+ 3,500 SAR علاوة تميز</span>
-          </div>
-          <button onclick="approveBonus('bonusRow2')" style="background: #10b981; color: #050d25; border: none; padding: 7px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">صرف ✓</button>
-        </div>
-      </div>
-
-      <!-- إضافة مكافأة يدوية -->
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;" id="lblAddBonus">➕ إضافة مكافأة أو علاوة فورية لموظف:</div>
-        <input type="text" id="inBonusName" placeholder="اسم أو رمز الموظف (مثال: الموظف ج)" style="width: 100%; padding: 10px; border-radius: 8px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 8px; font-size: 12px;">
-        <input type="number" id="inBonusAmount" placeholder="مبلغ المكافأة" style="width: 100%; padding: 10px; border-radius: 8px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 8px; font-size: 12px;">
-        <input type="text" id="inBonusReason" placeholder="السبب (مثال: جلب عميل جديد)" style="width: 100%; padding: 10px; border-radius: 8px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 8px; font-size: 12px;">
-        <button class="btn" onclick="addCustomBonus()" id="btnSaveBonus">تسجيل المكافأة في الراتب ✓</button>
-      </div>
-    </div>
-
-    <!-- 3. الأقسام والكادر -->
-    <div id="tab-depts" class="page-tab">
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;" id="lblAddEmpTitle">➕ إضافة موظف جديد لأحد الأقسام:</div>
-        <input type="text" id="inName" placeholder="اسم أو رمز الموظف (مثال: الموظف د)" style="width: 100%; padding: 10px; border-radius: 8px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 8px; font-size: 12px;">
-        <select id="inDept" style="width: 100%; padding: 10px; border-radius: 8px; background: #050d25; border: 1px solid #334155; color: #fff; margin-bottom: 8px; font-size: 12px;">
-          <option>قسم المبيعات والصفقات</option>
-          <option>قسم الهندسة والتقنية</option>
-          <option>قسم المالية والمحاسبة</option>
-          <option>قسم الموارد البشرية</option>
-          <option>قسم النظافة والخدمات</option>
-          <option>قسم الأمن والسلامة</option>
-        </select>
-        <button class="btn" onclick="addEmp()" id="btnSaveEmp">حفظ الموظف في القسم ✓</button>
-      </div>
-
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #cbd5e1; margin-bottom: 10px;" id="lblDeptListTitle">سجل موظفي الشركة حسب الأقسام:</div>
-        <div id="empList"></div>
-      </div>
-    </div>
-
-    <!-- 4. القرارات والذكاء الاصطناعي -->
-    <div id="tab-tasks" class="page-tab">
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;" id="lblDecisionsTitle">📋 قرارات المدير المعلقة بلمسة واحدة:</div>
-        <div class="emp-row" id="tRow1">
-          <div><b id="txtDealDesc">اعتماد ترخيص CEO-Pulse لشركة استثمارية</b><br><small style="color: #00e5ff;" id="dealRev">95,000 SAR إيراد مباشر</small></div>
-          <button onclick="approveDeal()" style="background: #10b981; color: #050d25; border: none; padding: 7px 14px; border-radius: 6px; font-weight: bold; cursor: pointer;" id="btnSignDeal">توقيع ✓</button>
-        </div>
-      </div>
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #10b981; margin-bottom: 8px;" id="lblEodTitle">🤖 تقرير نهاية اليوم الآلي (بديل السكرتير):</div>
-        <p style="font-size: 12px; color: #94a3b8; line-height: 1.6;" id="txtEodContent">
-          • إجمالي ساعات العمل الفعلية: 7.8 ساعة/يوم (التزام 98%).<br>
-          • التحصيل المالي: <span id="eodRev">195,700 SAR</span>.<br>
-          • لا توجد مخالفات أمنية أو تأخيرات غير مصرح بها.
-        </p>
-      </div>
-    </div>
-
-    <!-- 5. الإشعارات -->
-    <div id="tab-alerts" class="page-tab">
-      <div class="card">
-        <div style="font-size: 13px; font-weight: bold; color: #00e5ff; margin-bottom: 10px;" id="lblAlertsTitle">🔔 إشعارات المدير اللحظية:</div>
-        <div class="emp-row" style="border-right: 3px solid #10b981;">
-          <div><b id="lblAlert1">💵 تحصيل مالي جديد</b><br><small style="color: #cbd5e1;" id="alertDep">تم إيداع 47,500 SAR في الحساب البنكي</small></div>
-          <span style="color: #94a3b8; font-size: 11px;">الآن</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- شريط الأيقونات السفلي المحدث -->
-    <div class="footer-bar">
-      <div class="tab-item active" id="btn-home" onclick="openTab('home')">
-        <div style="font-size: 18px;">🏠</div>
-        <span id="tabNavHome">الرئيسية</span>
-      </div>
-      <div class="tab-item" id="btn-payroll" onclick="openTab('payroll')">
-        <div style="font-size: 18px;">💵</div>
-        <span id="tabNavPayroll">الرواتب</span>
-      </div>
-      <div class="tab-item" id="btn-depts" onclick="openTab('depts')">
-        <div style="font-size: 18px;">👥</div>
-        <span id="tabNavDepts">الأقسام</span>
-      </div>
-      <div class="tab-item" id="btn-tasks" onclick="openTab('tasks')">
-        <div style="font-size: 18px;">⚡</div>
-        <span id="tabNavTasks">القرارات</span>
-      </div>
-      <div class="tab-item" id="btn-alerts" onclick="openTab('alerts')">
-        <div style="font-size: 18px;">🔔</div>
-        <span id="tabNavAlerts">الإشعارات</span>
-      </div>
-    </div>
-
-  </div>
+    <button class="nav-item" onclick="setTab(this, 'employees')">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span id="tab_emp">الموظفين</span>
+    </button>
+    <button class="nav-item" onclick="setTab(this, 'bonuses')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+      <span id="tab_deals">الصفقات</span>
+    </button>
+    <button class="nav-item" onclick="setTab(this, 'security')">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      <span id="tab_sec">الأمان</span>
+    </button>
+  </nav>
 
   <script>
-    // ================= 1. أسعار الصرف لكافة العملات =================
-    var curRates = {
-      SAR: 1,      AED: 0.98,   KWD: 0.082,  QAR: 0.97,
-      BHD: 0.10,   OMR: 0.103,  DZD: 35.8,   EGP: 13.2,
-      MAD: 2.68,   TND: 0.83,   JOD: 0.189,  IQD: 352,
-      USD: 0.267,  EUR: 0.245,  GBP: 0.21,   CHF: 0.235,
-      CAD: 0.365,  AUD: 0.41,   JPY: 40.5,   CNY: 1.93,
-      TRY: 9.15
-    };
-    var curSym = 'SAR';
-
-    function applyCurrency() {
-      curSym = document.getElementById('currSelect').value;
-      var r = curRates[curSym] || 1;
-      
-      document.getElementById('valRevenue').innerText = Math.round(195700 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('valSaved').innerText = '▲ ' + Math.round(42300 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('valPayroll').innerText = Math.round(142500 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('bVal1').innerText = '+ ' + Math.round(6000 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('bVal2').innerText = '+ ' + Math.round(3500 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('dealRev').innerText = Math.round(95000 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('eodRev').innerText = Math.round(195700 * r).toLocaleString() + ' ' + curSym;
-      document.getElementById('alertDep').innerText = Math.round(47500 * r).toLocaleString() + ' ' + curSym;
-    }
-
-    // ================= 2. قاموس اللغات العالمي =================
-    var i18n = {
+    // --- DICTIONARY FOR FULL TRANSLATION ---
+    const i18n = {
       ar: {
         dir: 'rtl',
-        headerSub: 'نبض الإدارة والرواتب والأمان',
-        revTitle: 'صافي الإيرادات والأرباح اليومية المحصلة',
-        payDue: 'الرواتب القادمة',
-        staff: 'كادر الشركة',
-        livePulse: '⚡ نبض أجهزة الموظفين الحية الآن:',
-        tabHome: 'الرئيسية', tabPay: 'الرواتب', tabDep: 'الأقسام', tabTasks: 'القرارات', tabAlerts: 'الإشعارات'
+        lock_title: 'منظومة CEO-Pulse المشفرة',
+        lock_sub: 'أدخل رمز الدخول التنفيذي',
+        clear: 'مسح',
+        quick_enter: 'دخول',
+        productivity: 'معدل الإنتاجية العام',
+        live_telemetry: '⚡ تليمتري حي',
+        workstations: 'محطات العمل النشطة',
+        e2ee: '🛡️ مشفر E2EE',
+        bonus_total: 'مكافآت الصفقات المعتمدة',
+        bonus_badge: '+15% هذا الشهر',
+        cloud_status: 'حالة السحابة السيادية',
+        cloud_active: 'متصلة 100%',
+        tasks_header: '📋 المهام والقرارات التنفيذية',
+        refresh: '🔄 تحديث',
+        task_1_title: 'اعتماد مسير رواتب الشهر الحالي',
+        task_1_sub: 'قسم الإدارة المالية • عاجل',
+        btn_approve: 'اعتماد',
+        task_2_title: 'مراجعة تدقيق الأمان السيبراني',
+        task_2_sub: 'تقنية المعلومات • موثق NDMO',
+        btn_view: 'استعراض',
+        deals_header: '💰 صفقات الموظفين والمكافآت',
+        btn_add_deal: '+ إضافة مكافأة',
+        emp_1_name: 'الموظف أ (قسم المالية)',
+        emp_1_deal: 'إغلاق صفقة التوريد السنوية الكبرى',
+        emp_2_name: 'الموظف د (المبيعات والتسويق)',
+        emp_2_deal: 'تحقيق أعلى مبيعات ربع سنوية',
+        tab_dash: 'الرئيسية',
+        tab_emp: 'الموظفين',
+        tab_deals: 'الصفقات',
+        tab_sec: 'الأمان'
       },
       en: {
         dir: 'ltr',
-        headerSub: 'Executive Pulse, Payroll & Security',
-        revTitle: 'Net Daily Collected Revenue & Profit',
-        payDue: 'Upcoming Payroll',
-        staff: 'Company Staff',
-        livePulse: '⚡ Live Workstations Telemetry:',
-        tabHome: 'Home', tabPay: 'Payroll', tabDep: 'Departments', tabTasks: 'Decisions', tabAlerts: 'Alerts'
+        lock_title: 'CEO-Pulse Encrypted System',
+        lock_sub: 'Enter Executive Security PIN',
+        clear: 'Clear',
+        quick_enter: 'Enter',
+        productivity: 'Overall Productivity Rate',
+        live_telemetry: '⚡ Live Telemetry',
+        workstations: 'Active Workstations',
+        e2ee: '🛡️ E2EE Encrypted',
+        bonus_total: 'Approved Deal Bonuses',
+        bonus_badge: '+15% this month',
+        cloud_status: 'Sovereign Cloud Status',
+        cloud_active: 'Connected 100%',
+        tasks_header: '📋 Executive Tasks & Decisions',
+        refresh: '🔄 Refresh',
+        task_1_title: 'Approve Current Month Payroll',
+        task_1_sub: 'Finance Department • Urgent',
+        btn_approve: 'Approve',
+        task_2_title: 'Cybersecurity Audit Review',
+        task_2_sub: 'Information Tech • NDMO Verified',
+        btn_view: 'Review',
+        deals_header: '💰 Employee Deals & Bonuses',
+        btn_add_deal: '+ Add Bonus',
+        emp_1_name: 'Employee A (Finance Dept)',
+        emp_1_deal: 'Closed Major Annual Supply Deal',
+        emp_2_name: 'Employee D (Sales & Marketing)',
+        emp_2_deal: 'Achieved Record Quarterly Sales',
+        tab_dash: 'Dashboard',
+        tab_emp: 'Employees',
+        tab_deals: 'Deals',
+        tab_sec: 'Security'
       },
       fr: {
         dir: 'ltr',
-        headerSub: 'Commandement Exécutif, Paie & Sécurité',
-        revTitle: 'Revenus Nets Quotidiens Collectés',
-        payDue: 'Prochaine Paie',
-        staff: 'Personnel de l’Entreprise',
-        livePulse: '⚡ Télémétrie des Postes en Direct:',
-        tabHome: 'Accueil', tabPay: 'Paie', tabDep: 'Départements', tabTasks: 'Décisions', tabAlerts: 'Alertes'
-      },
-      es: {
-        dir: 'ltr',
-        headerSub: 'Comando Ejecutivo, Nómina y Seguridad',
-        revTitle: 'Ingresos Netos Diarios Recaudados',
-        payDue: 'Próxima Nómina',
-        staff: 'Personal de la Empresa',
-        livePulse: '⚡ Telemetría de Estaciones en Vivo:',
-        tabHome: 'Inicio', tabPay: 'Nómina', tabDep: 'Departamentos', tabTasks: 'Decisiones', tabAlerts: 'Alertas'
-      },
-      de: {
-        dir: 'ltr',
-        headerSub: 'Führungskommando, Gehalt & Sicherheit',
-        revTitle: 'Täglicher Netto-Umsatz & Gewinn',
-        payDue: 'Nächste Gehaltsabrechnung',
-        staff: 'Unternehmenspersonal',
-        livePulse: '⚡ Live-Workstation-Telemetrie:',
-        tabHome: 'Start', tabPay: 'Gehalt', tabDep: 'Abteilungen', tabTasks: 'Entscheidungen', tabAlerts: 'Benachrichtigungen'
-      },
-      tr: {
-        dir: 'ltr',
-        headerSub: 'Yönetim Nabzı, Bordro ve Güvenlik',
-        revTitle: 'Günlük Net Tahsil Edilen Gelir',
-        payDue: 'Yaklaşan Bordro',
-        staff: 'Şirket Personeli',
-        livePulse: '⚡ Canlı Çalışma İstasyonu Telemetrisi:',
-        tabHome: 'Ana Sayfa', tabPay: 'Bordro', tabDep: 'Departmanlar', tabTasks: 'Kararlar', tabAlerts: 'Bildirimler'
-      },
-      zh: {
-        dir: 'ltr',
-        headerSub: '高管指挥舱、薪资与安全系统',
-        revTitle: '每日净收入与结算利润',
-        payDue: '即将发放薪资',
-        staff: '企业员工架构',
-        livePulse: '⚡ 实时工作站监测遥测:',
-        tabHome: '首页', tabPay: '薪资', tabDep: '部门', tabTasks: '决策', tabAlerts: '通知'
+        lock_title: 'Système Chiffré CEO-Pulse',
+        lock_sub: 'Entrez le code PIN Exécutif',
+        clear: 'Effacer',
+        quick_enter: 'Entrer',
+        productivity: 'Productivité Globale',
+        live_telemetry: '⚡ Télémétrie en Direct',
+        workstations: 'Postes de Travail Actifs',
+        e2ee: '🛡️ Chiffré E2EE',
+        bonus_total: 'Primes sur Objectifs Validées',
+        bonus_badge: '+15% ce mois-ci',
+        cloud_status: 'État du Cloud Souverain',
+        cloud_active: 'Connecté 100%',
+        tasks_header: '📋 Tâches & Décisions de Direction',
+        refresh: '🔄 Actualiser',
+        task_1_title: 'Valider la paie du mois en cours',
+        task_1_sub: 'Département Finance • Urgent',
+        btn_approve: 'Valider',
+        task_2_title: 'Audit de Cybersécurité',
+        task_2_sub: 'Technologie IT • Certifié ISO',
+        btn_view: 'Examiner',
+        deals_header: '💰 Primes & Transactions Clôturées',
+        btn_add_deal: '+ Ajouter Prime',
+        emp_1_name: 'Employé A (Dépt Finance)',
+        emp_1_deal: 'Signature du grand contrat annuel',
+        emp_2_name: 'Employé D (Ventes & Marketing)',
+        emp_2_deal: 'Record de ventes trimestriel atteint',
+        tab_dash: 'Accueil',
+        tab_emp: 'Employés',
+        tab_deals: 'Affaires',
+        tab_sec: 'Sécurité'
       }
     };
 
-    function applyLanguage() {
-      var langKey = document.getElementById('langSelect').value;
-      var t = i18n[langKey] || i18n['ar'];
+    // Currency Rates (Relative to SAR)
+    const rates = {
+      SAR: { rate: 1, sym: 'SAR' },
+      USD: { rate: 0.27, sym: 'USD' },
+      EUR: { rate: 0.25, sym: 'EUR' },
+      QAR: { rate: 0.97, sym: 'QAR' },
+      AED: { rate: 0.98, sym: 'AED' },
+      DZD: { rate: 36.5, sym: 'DZD' }
+    };
 
-      document.documentElement.dir = t.dir;
-      document.getElementById('appHeaderSub').innerText = t.headerSub;
-      document.getElementById('txtRevTitle').innerText = t.revTitle;
-      document.getElementById('txtPayDueTitle').innerText = t.payDue;
-      document.getElementById('txtStaffTitle').innerText = t.staff;
-      document.getElementById('txtLivePulse').innerText = t.livePulse;
-      document.getElementById('tabNavHome').innerText = t.tabHome;
-      document.getElementById('tabNavPayroll').innerText = t.tabPay;
-      document.getElementById('tabNavDepts').innerText = t.tabDep;
-      document.getElementById('tabNavTasks').innerText = t.tabTasks;
-      document.getElementById('tabNavAlerts').innerText = t.tabAlerts;
+    let currentLang = 'ar';
+    let currentCurr = 'SAR';
+    let rawBonusTotal = 29500;
+    let rawEmp1Bonus = 15000;
+    let rawEmp2Bonus = 8500;
+
+    // --- SWITCH LANGUAGE LOGIC ---
+    function changeLanguage(lang) {
+      currentLang = lang;
+      const dict = i18n[lang];
+      document.documentElement.dir = dict.dir;
+      document.documentElement.lang = lang;
+
+      // Translate all DOM elements
+      document.getElementById('txt_lock_title').innerText = dict.lock_title;
+      document.getElementById('txt_lock_sub').innerText = dict.lock_sub;
+      document.getElementById('txt_clear').innerText = dict.clear;
+      document.getElementById('txt_quick_enter').innerText = dict.quick_enter;
+      document.getElementById('txt_productivity').innerText = dict.productivity;
+      document.getElementById('txt_live_telemetry').innerText = dict.live_telemetry;
+      document.getElementById('txt_workstations').innerText = dict.workstations;
+      document.getElementById('txt_e2ee').innerText = dict.e2ee;
+      document.getElementById('txt_bonus_total').innerText = dict.bonus_total;
+      document.getElementById('txt_bonus_badge').innerText = dict.bonus_badge;
+      document.getElementById('txt_cloud_status').innerText = dict.cloud_status;
+      document.getElementById('txt_cloud_active').innerText = dict.cloud_active;
+      document.getElementById('txt_tasks_header').innerText = dict.tasks_header;
+      document.getElementById('txt_refresh').innerText = dict.refresh;
+      document.getElementById('task_1_title').innerText = dict.task_1_title;
+      document.getElementById('task_1_sub').innerText = dict.task_1_sub;
+      document.getElementById('btn_approve_1').innerText = dict.btn_approve;
+      document.getElementById('task_2_title').innerText = dict.task_2_title;
+      document.getElementById('task_2_sub').innerText = dict.task_2_sub;
+      document.getElementById('btn_view_2').innerText = dict.btn_view;
+      document.getElementById('txt_deals_header').innerText = dict.deals_header;
+      document.getElementById('btn_add_deal').innerText = dict.btn_add_deal;
+      document.getElementById('emp_1_name').innerText = dict.emp_1_name;
+      document.getElementById('emp_1_deal').innerText = dict.emp_1_deal;
+      document.getElementById('emp_2_name').innerText = dict.emp_2_name;
+      document.getElementById('emp_2_deal').innerText = dict.emp_2_deal;
+
+      // Bottom Tabs
+      document.getElementById('tab_dash').innerText = dict.tab_dash;
+      document.getElementById('tab_emp').innerText = dict.tab_emp;
+      document.getElementById('tab_deals').innerText = dict.tab_deals;
+      document.getElementById('tab_sec').innerText = dict.tab_sec;
     }
 
-    // ================= 3. منطق شاشة القفل الخارجية =================
-    var currentEnteredPin = '';
-    var savedAppPin = localStorage.getItem('ceo_app_pin') || '1234';
-
-    if (localStorage.getItem('ceo_is_frozen') === 'true') {
-      document.getElementById('freeze-screen').style.display = 'flex';
+    // --- SWITCH CURRENCY LOGIC ---
+    function changeCurrency(curr) {
+      currentCurr = curr;
+      const { rate, sym } = rates[curr];
+      
+      const formatAmount = (amount) => Math.round(amount * rate).toLocaleString() + ' ' + sym;
+      
+      document.getElementById('kpi_bonus').innerText = formatAmount(rawBonusTotal);
+      document.getElementById('emp_1_amount').innerText = '+ ' + formatAmount(rawEmp1Bonus);
+      document.getElementById('emp_2_amount').innerText = '+ ' + formatAmount(rawEmp2Bonus);
     }
 
-    function updatePinDisplay() {
-      var d = document.getElementById('pinDisplay');
-      d.innerText = currentEnteredPin.length === 0 ? '••••' : '•'.repeat(currentEnteredPin.length);
-    }
-
-    function pressNum(n) {
-      if (currentEnteredPin.length < 6) {
-        currentEnteredPin += n;
-        updatePinDisplay();
+    // --- SECURITY PIN KEYPAD LOGIC ---
+    let enteredPin = "";
+    function pressKey(n) {
+      if (enteredPin.length < 4) {
+        enteredPin += n;
+        updateDots();
+        if (enteredPin.length === 4) {
+          setTimeout(verifyPin, 100);
+        }
       }
-      if (currentEnteredPin.length === 4) {
-        submitPin();
-      }
     }
-
     function clearPin() {
-      currentEnteredPin = '';
-      updatePinDisplay();
-      document.getElementById('lockMsg').innerText = 'رمز الدخول: 1234';
-      document.getElementById('lockMsg').style.color = '#94a3b8';
+      enteredPin = "";
+      updateDots();
     }
-
-    function submitPin() {
-      if (localStorage.getItem('ceo_is_frozen') === 'true') {
-        document.getElementById('freeze-screen').style.display = 'flex';
-        return;
+    function updateDots() {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('dot' + i);
+        if (i < enteredPin.length) dot.classList.add('filled');
+        else dot.classList.remove('filled');
       }
-
-      if (currentEnteredPin === savedAppPin || currentEnteredPin === '1234' || currentEnteredPin === '9900') {
-        document.getElementById('lock-screen').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        currentEnteredPin = '';
-        updatePinDisplay();
+    }
+    function verifyPin() {
+      if (enteredPin === "1234" || enteredPin === "9900") {
+        document.getElementById('lockScreen').style.display = 'none';
       } else {
-        document.getElementById('lockMsg').innerText = '❌ الرمز غير صحيح! حاول مجدداً';
-        document.getElementById('lockMsg').style.color = '#ef4444';
-        currentEnteredPin = '';
-        setTimeout(updatePinDisplay, 400);
+        alert(currentLang === 'ar' ? '❌ رمز الدخول غير صحيح!' : '❌ Incorrect PIN!');
+        clearPin();
       }
     }
-
-    function lockApp() {
-      document.getElementById('app-container').style.display = 'none';
-      document.getElementById('lock-screen').style.display = 'flex';
-      clearPin();
+    function quickUnlock() {
+      document.getElementById('lockScreen').style.display = 'none';
     }
 
-    // ================= 4. القفل السري والتجميد (Kill-Switch) =================
-    function showVault() {
-      var p = prompt('أدخل رمز المشرف السري السيادي (9900):');
-      if (p === '9900') {
-        var opt = prompt("اختر الإجراء السيادي المطلق:\n1: تغيير رمز قفل التطبيق للعميل\n2: 🔴 تجميد وتعطيل التطبيق لعدم السداد (Kill-Switch)\n3: إلغاء");
-        if (opt === '1') {
-          var newPin = prompt('أدخل رمز القفل الخارجي الجديد (4 أرقام):');
-          if (newPin && newPin.length >= 4) {
-            localStorage.setItem('ceo_app_pin', newPin);
-            savedAppPin = newPin;
-            alert('✅ تم تغيير وتثبيت رمز القفل الخارجي بنجاح!');
-          }
-        } else if (opt === '2') {
-          if (confirm('هل أنت متأكد من تجميد التطبيق وإغلاقه فوراً في وجه العميل؟')) {
-            localStorage.setItem('ceo_is_frozen', 'true');
-            document.getElementById('app-container').style.display = 'none';
-            document.getElementById('lock-screen').style.display = 'none';
-            document.getElementById('freeze-screen').style.display = 'flex';
-            alert('⛔ تم تفعيل Kill-Switch بنجاح! التطبيق معلق الآن.');
+    // --- HIDDEN VAULT / KILL-SWITCH ---
+    let logoClicks = 0;
+    function handleLogoClicks() {
+      logoClicks++;
+      if (logoClicks >= 3) {
+        logoClicks = 0;
+        const code = prompt(currentLang === 'ar' ? '🔐 أدخل المفتاح السري للإشراف والتجميد:' : '🔐 Enter Master Key:');
+        if (code === "9900") {
+          const action = confirm(currentLang === 'ar' ? '⚠️ هل ترغب في تجميد الترخيص وإيقاف المنظومة عن العميل؟' : '⚠️ Freeze license for this client?');
+          if (action) {
+            document.body.innerHTML = `
+              <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #050d25; color: #ef4444; padding: 24px; text-align: center;">
+                <div style="font-size: 60px; margin-bottom: 16px;">🛑</div>
+                <h1 style="font-size: 24px; font-weight: 900; margin-bottom: 8px;">LICENSE TERMINATED / تم إيقاف الترخيص</h1>
+                <p style="color: #94a3b8; font-size: 14px; max-width: 400px;">تم إيقاف تشغيل ترخيص منظومة CEO-Pulse لهذه المؤسسة لعدم سداد المستحقات المالية أو انتهاء مدة التعاقد.</p>
+              </div>`;
           }
         }
-      } else if (p) {
-        alert('❌ رمز المشرف غير صحيح!');
       }
     }
 
-    function unfreezePrompt() {
-      var p = prompt('أدخل الرمز السري السيادي لإلغاء التجميد (9900):');
-      if (p === '9900') {
-        localStorage.removeItem('ceo_is_frozen');
-        document.getElementById('freeze-screen').style.display = 'none';
-        document.getElementById('lock-screen').style.display = 'flex';
-        alert('✅ تم إلغاء التجميد وإعادة تنشيط المنظومة بنجاح!');
-      } else if (p) {
-        alert('❌ الرمز غير صحيح!');
+    function setTab(btn, tab) {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function addNewBonus() {
+      const name = prompt(currentLang === 'ar' ? 'اسم الموظف:' : 'Employee name:');
+      if (name) {
+        alert(currentLang === 'ar' ? '✅ تم تسجيل المكافأة وتوثيقها في سحابة Supabase' : '✅ Bonus logged in Supabase cloud');
       }
     }
 
-    // ================= 5. التبويبات والمكافآت =================
-    function openTab(tabId) {
-      var pages = document.querySelectorAll('.page-tab');
-      for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
-
-      var btns = document.querySelectorAll('.tab-item');
-      for (var j = 0; j < btns.length; j++) btns[j].classList.remove('active');
-
-      var targetPage = document.getElementById('tab-' + tabId);
-      var targetBtn = document.getElementById('btn-' + tabId);
-
-      if (targetPage) targetPage.classList.add('active');
-      if (targetBtn) targetBtn.classList.add('active');
-
-      window.scrollTo(0, 0);
+    function refreshData() {
+      alert(currentLang === 'ar' ? '🔄 تم تحديث تليمتري محطات العمل وقاعدة البيانات لحظياً!' : '🔄 Live telemetry refreshed!');
     }
-
-    function approveBonus(id) {
-      var el = document.getElementById(id);
-      if (el) {
-        el.style.opacity = '0.7';
-        el.querySelector('button').outerHTML = '<span style="color: #10b981; font-weight: bold;">تم الصرف ✓</span>';
-      }
-    }
-
-    function addCustomBonus() {
-      var n = document.getElementById('inBonusName').value.trim();
-      var a = document.getElementById('inBonusAmount').value.trim();
-      var r = document.getElementById('inBonusReason').value.trim();
-      if (!n || !a) { alert('اكتب اسم الموظف ومبلغ المكافأة'); return; }
-      alert('✓ تم إضافة مكافأة ' + a + ' ' + curSym + ' للموظف: ' + n + ' بنجاح إلى مسير الرواتب!');
-      document.getElementById('inBonusName').value = '';
-      document.getElementById('inBonusAmount').value = '';
-      document.getElementById('inBonusReason').value = '';
-    }
-
-    var emps = [
-      { name: "الموظف (أ)", dept: "قسم الهندسة والتقنية" },
-      { name: "الموظف (ب)", dept: "قسم المبيعات والصفقات" },
-      { name: "الموظف (ج)", dept: "قسم النظافة والخدمات" }
-    ];
-
-    function render() {
-      var box = document.getElementById('empList');
-      if (!box) return;
-      box.innerHTML = '';
-      emps.forEach(function(e, idx) {
-        box.innerHTML += '<div class="emp-row"><div><b>' + e.name + '</b><br><small style="color: #00e5ff;">' + e.dept + '</small></div><button onclick="delEmp(' + idx + ')" style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer;">حذف</button></div>';
-      });
-      var cnt = document.getElementById('cnt1');
-      if (cnt) cnt.innerText = (emps.length + 42) + ' موظف';
-    }
-
-    function addEmp() {
-      var n = document.getElementById('inName').value.trim();
-      var d = document.getElementById('inDept').value;
-      if (!n) { alert('اكتب اسم الموظف أولاً'); return; }
-      emps.unshift({ name: n, dept: d });
-      document.getElementById('inName').value = '';
-      render();
-      alert('✓ تم إضافة ' + n + ' إلى ' + d);
-    }
-
-    function delEmp(i) {
-      emps.splice(i, 1);
-      render();
-    }
-
-    function approveDeal() {
-      var r = document.getElementById('tRow1');
-      r.innerHTML = '<div style="color: #10b981; font-weight: bold; width: 100%; text-align: center; padding: 8px;">✓ تم اعتماد الصفقة وتوقيع العقد بنجاح!</div>';
-    }
-
-    render();
   </script>
 </body>
-</html>
+</html

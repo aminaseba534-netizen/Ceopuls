@@ -53,7 +53,6 @@
       padding: 10px 18px;
       font-size: 13px;
     }
-    /* زر التثبيت المصغر الأنيق */
     .btn-install-mini {
       background: rgba(0, 229, 255, 0.12);
       border: 1px solid rgba(0, 229, 255, 0.45);
@@ -289,8 +288,8 @@
         <option value="tr">Türkçe 🇹🇷</option>
       </select>
 
-      <!-- زر التثبيت المصغر الأنيق وغير المؤثر على الواجهة -->
-      <button type="button" class="btn btn-install-mini" onclick="handleInstallClick()" title="تثبيت التطبيق على جهازك">
+      <!-- زر التثبيت المباشر الفوري -->
+      <button type="button" class="btn btn-install-mini" onclick="executeInstallDirect()" title="تثبيت التطبيق فوراً بنقرة واحدة">
         📲 تثبيت
       </button>
 
@@ -469,34 +468,6 @@
     </button>
   </nav>
 
-  <!-- نافذة تثبيت التطبيق الإرشادية الذكية -->
-  <div id="installModal" class="modal-overlay">
-    <div class="modal-box">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h3 style="font-size: 16px; font-weight: 800; color: #00e5ff;" id="installModalHead">📲 تثبيت CEO-Pulse على جهازك</h3>
-        <button type="button" onclick="closeModal('installModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
-      </div>
-
-      <div style="background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; padding: 14px; font-size: 12px; line-height: 1.7; color: #e2e8f0; margin-bottom: 14px;" id="installModalBody">
-        <strong>📱 لهواتف الأندرويد وفيفو (Vivo Browser / Chrome):</strong><br>
-        1. اضغط على القائمة (⋮) أو خيارات المتصفح.<br>
-        2. اختر: <strong>«تثبيت التطبيق»</strong> أو <strong>«إضافة إلى الشاشة الرئيسية»</strong>.<br>
-        3. ستظهر أيقونة التطبيق السيادية فوراً على شاشتك!<br><br>
-        <strong>🍏 لهواتف الآيفون (Safari):</strong><br>
-        اضغط زر المشاركة (⎋) ثم <strong>«Add to Home Screen»</strong>.
-      </div>
-
-      <div style="display: flex; gap: 8px;">
-        <button type="button" class="btn btn-primary" style="flex: 1; padding: 11px;" onclick="triggerNativeInstallPrompt()">
-          تثبيت فوري
-        </button>
-        <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 11px;" onclick="closeModal('installModal')">
-          إغلاق
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Super-Admin / Kill-Switch Modal (PIN: 9900) -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box">
@@ -549,7 +520,39 @@
     const masterSuperKey = "9900";
     let deferredPrompt = null;
 
-    // Currency Multipliers relative to SAR
+    // تسجيل الـ Service Worker لفتح تصريح التثبيت الآلي فوراً
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('CEO-Pulse Service Worker Active:', reg.scope))
+          .catch(err => console.log('SW registration fallback:', err));
+      });
+    }
+
+    // التقاط تصريح التثبيت النظامي
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('✅ CEO-Pulse ready for 1-click install');
+    });
+
+    // تنفيذ التثبيت بنقرة واحدة حقيقية
+    function executeInstallDirect() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User installed CEO-Pulse app!');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        // للمتصفحات التي لا تدعم beforeinstallprompt مباشرة كفيفو
+        alert("📲 جاري تجهيز أيقونة التطبيق...\nمن شريط المتصفح، اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» لتظهر فوراً على شاشتك بملء الشاشة!");
+      }
+    }
+
+    // Currency Multipliers
     const rates = {
       SAR: 1, USD: 0.27, EUR: 0.25, AED: 0.98, QAR: 0.97,
       KWD: 0.082, BHD: 0.10, OMR: 0.10, DZD: 36.2, MAD: 2.68,
@@ -712,36 +715,6 @@
       }
     };
 
-    // PWA Install Event Handler
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log('CEO-Pulse install prompt registered');
-    });
-
-    function handleInstallClick() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User installed CEO-Pulse app');
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        openModal('installModal');
-      }
-    }
-
-    function triggerNativeInstallPrompt() {
-      if (deferredPrompt) {
-        handleInstallClick();
-        closeModal('installModal');
-      } else {
-        alert("💡 من خيارات المتصفح (⋮) أو زر المشاركة (⎋)، اضغط: «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».");
-      }
-    }
-
     // Keypad Logic
     function pressKey(num) {
       if (enteredPin.length < 4) {
@@ -808,7 +781,7 @@
       if (el2) el2.innerText = "+ " + b1 + " " + curr;
     }
 
-    // Full Real-time Translation across all elements
+    // Real-time Translation
     function changeLanguage(lang) {
       const dict = i18n[lang] || i18n['ar'];
       document.documentElement.lang = lang;

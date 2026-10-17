@@ -13,14 +13,10 @@
 
   <!-- أيقونة الدرع السيادي بدقة فائقة -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23050d25'/><circle cx='256' cy='256' r='145' fill='%230a122a' stroke='%2300e5ff' stroke-width='6'/><path d='M140 256 L205 256 L230 190 L265 330 L295 220 L320 275 L340 256 L372 256' fill='none' stroke='%2300e5ff' stroke-width='18' stroke-linecap='round' stroke-linejoin='round'/><circle cx='372' cy='256' r='12' fill='%2300e5ff'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23050d25'/><circle cx='256' cy='256' r='145' fill='%230a122a' stroke='%2300e5ff' stroke-width='6'/><path d='M140 256 L205 256 L230 190 L265 330 L295 220 L320 275 L340 256 L372 256' fill='none' stroke='%2300e5ff' stroke-width='18' stroke-linecap='round' stroke-linejoin='round'/><circle cx='372' cy='256' r='12' fill='%2300e5ff'/></svg>">
 
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: rgba(0, 229, 255, 0.2);
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
     body {
       background-color: #050d25;
       color: #f8fafc;
@@ -32,7 +28,7 @@
     .neon-cyan { color: #00e5ff; }
     .glass-card {
       background: rgba(10, 18, 42, 0.9);
-      border: 1px solid rgba(0, 229, 255, 0.25);
+      border: 1px solid rgba(0, 229, 255, 0.22);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
@@ -40,21 +36,31 @@
     .btn {
       cursor: pointer;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: bold;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 5px;
       touch-action: manipulation;
       user-select: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
     .btn:active { transform: scale(0.96); opacity: 0.85; }
     .btn-primary {
       background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
       color: #050d25;
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 10px 18px;
+      font-size: 13px;
+    }
+    /* زر التثبيت المصغر الأنيق */
+    .btn-install-mini {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.45);
+      color: #00e5ff;
+      padding: 5px 8px;
+      font-size: 11px;
+      border-radius: 8px;
     }
     .badge {
       display: inline-block;
@@ -72,15 +78,15 @@
       z-index: 40;
       background: #050d25;
       border-bottom: 1px solid rgba(0, 229, 255, 0.25);
-      padding: 12px 16px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .logo-box { display: flex; align-items: center; gap: 8px; }
     .shield-icon {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 10px;
       background: linear-gradient(135deg, #00e5ff, #8b5cf6);
       display: flex;
@@ -88,12 +94,12 @@
       justify-content: center;
       font-size: 18px;
     }
-    .controls { display: flex; align-items: center; gap: 6px; }
+    .controls { display: flex; align-items: center; gap: 5px; }
     select {
       background: #0a122a;
       color: #00e5ff;
       border: 1px solid rgba(0, 229, 255, 0.4);
-      padding: 6px 8px;
+      padding: 5px 6px;
       border-radius: 8px;
       font-size: 11px;
       outline: none;
@@ -114,7 +120,7 @@
       border-top: 1px solid rgba(0, 229, 255, 0.35);
       display: flex;
       justify-content: space-around;
-      padding: 10px 4px;
+      padding: 8px 4px;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
     }
     .nav-item {
@@ -123,7 +129,7 @@
       align-items: center;
       gap: 3px;
       color: #94a3b8;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
       background: none;
       border: none;
@@ -134,7 +140,7 @@
       padding: 4px 0;
     }
     .nav-item.active { color: #00e5ff; }
-    .nav-icon { font-size: 20px; pointer-events: none; }
+    .nav-icon { font-size: 19px; pointer-events: none; }
 
     /* Lock Screen Overlay */
     #lockScreen {
@@ -212,7 +218,7 @@
       🛡️
     </div>
     <h2 style="font-size: 20px; font-weight: 800; color: #fff;">CEO-Pulse Enterprise</h2>
-    <p style="color: #00e5ff; font-size: 12px; margin-top: 4px;">بوابة القيادة السيادية المشفرة</p>
+    <p style="color: #00e5ff; font-size: 12px; margin-top: 4px;" id="lockSubTitle">بوابة القيادة السيادية المشفرة</p>
 
     <div class="pin-dots">
       <div class="pin-dot" id="dot1"></div>
@@ -231,13 +237,13 @@
       <button type="button" class="key-btn" onclick="pressKey('7')">7</button>
       <button type="button" class="key-btn" onclick="pressKey('8')">8</button>
       <button type="button" class="key-btn" onclick="pressKey('9')">9</button>
-      <button type="button" class="key-btn" style="font-size: 14px;" onclick="clearPin()">مسح</button>
+      <button type="button" class="key-btn" style="font-size: 14px;" onclick="clearPin()" id="btnKeyClear">مسح</button>
       <button type="button" class="key-btn" onclick="pressKey('0')">0</button>
-      <button type="button" class="key-btn" style="font-size: 14px; background: rgba(0,229,255,0.3); color: #00e5ff;" onclick="unlockAppDirect()">دخول</button>
+      <button type="button" class="key-btn" style="font-size: 14px; background: rgba(0,229,255,0.3); color: #00e5ff;" onclick="unlockAppDirect()" id="btnKeyEnter">دخول</button>
     </div>
 
     <div style="margin-top: 22px; text-align: center;">
-      <button type="button" class="btn btn-primary" style="padding: 12px 24px; border-radius: 999px; font-size: 14px; box-shadow: 0 0 20px rgba(0,229,255,0.3);" onclick="unlockAppDirect()">
+      <button type="button" class="btn btn-primary" style="padding: 11px 24px; border-radius: 999px; font-size: 13px; box-shadow: 0 0 20px rgba(0,229,255,0.3);" onclick="unlockAppDirect()" id="btnDirectBypass">
         ⚡ فتح التطبيق والدخول المباشر (1234)
       </button>
     </div>
@@ -248,12 +254,12 @@
     <div class="logo-box">
       <div class="shield-icon">⚡</div>
       <div>
-        <h1 style="font-size: 15px; font-weight: 800; color: #fff;">CEO-Pulse</h1>
-        <div style="font-size: 9px; color: #00e5ff; font-weight: bold;">المؤسسة الوطنية القابضة</div>
+        <h1 style="font-size: 14px; font-weight: 800; color: #fff;">CEO-Pulse</h1>
+        <div style="font-size: 9px; color: #00e5ff; font-weight: bold;" id="headerOrgName">المؤسسة الوطنية القابضة</div>
       </div>
     </div>
     <div class="controls">
-      <!-- Currency Selector -->
+      <!-- كافة العملات الـ 14 -->
       <select id="currencySelect" onchange="changeCurrency(this.value)">
         <option value="SAR">SAR 🇸🇦</option>
         <option value="USD">USD 🇺🇸</option>
@@ -261,69 +267,86 @@
         <option value="AED">AED 🇦🇪</option>
         <option value="QAR">QAR 🇶🇦</option>
         <option value="KWD">KWD 🇰🇼</option>
+        <option value="BHD">BHD 🇧🇭</option>
+        <option value="OMR">OMR 🇴🇲</option>
         <option value="DZD">DZD 🇩🇿</option>
+        <option value="MAD">MAD 🇲🇦</option>
+        <option value="EGP">EGP 🇪🇬</option>
+        <option value="GBP">GBP 🇬🇧</option>
+        <option value="CHF">CHF 🇨🇭</option>
+        <option value="JPY">JPY 🇯🇵</option>
       </select>
       
-      <!-- Language Selector -->
+      <!-- كافة اللغات الـ 8 -->
       <select id="langSelect" onchange="changeLanguage(this.value)">
         <option value="ar">العربية 🇸🇦</option>
         <option value="en">English 🇬🇧</option>
         <option value="fr">Français 🇫🇷</option>
+        <option value="es">Español 🇪🇸</option>
+        <option value="de">Deutsch 🇩🇪</option>
+        <option value="zh">中文 🇨🇳</option>
+        <option value="ru">Русский 🇷🇺</option>
+        <option value="tr">Türkçe 🇹🇷</option>
       </select>
 
+      <!-- زر التثبيت المصغر الأنيق وغير المؤثر على الواجهة -->
+      <button type="button" class="btn btn-install-mini" onclick="handleInstallClick()" title="تثبيت التطبيق على جهازك">
+        📲 تثبيت
+      </button>
+
       <!-- Lock & Master Super-Admin Buttons -->
-      <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 8px 10px; color: #fff;" onclick="lockAppNow()">🔒</button>
-      <button type="button" class="btn" style="background: rgba(0,229,255,0.2); border: 1px solid #00e5ff; padding: 8px 10px; color: #00e5ff;" onclick="openSuperAdminModal()">🛡️ المشرف</button>
+      <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 6px 8px; color: #fff;" onclick="lockAppNow()">🔒</button>
+      <button type="button" class="btn" style="background: rgba(0,229,255,0.18); border: 1px solid #00e5ff; padding: 6px 8px; color: #00e5ff; font-size: 11px;" onclick="openSuperAdminModal()" id="btnHeaderAdmin">🛡️ المشرف</button>
     </div>
   </header>
 
   <!-- Live Pulse Ticker -->
-  <div style="background: #08112e; padding: 8px 16px; border-bottom: 1px solid rgba(0,229,255,0.1); font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+  <div style="background: #08112e; padding: 7px 16px; border-bottom: 1px solid rgba(0,229,255,0.1); font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; align-items: center; gap: 6px;">
       <span style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></span>
-      <span style="color: #94a3b8;">سحابة باريس AWS (مشفرة E2EE)</span>
+      <span style="color: #94a3b8;" id="tickerCloudText">سحابة باريس AWS (مشفرة E2EE)</span>
     </div>
-    <span style="color: #00e5ff; font-weight: bold;">بث تليمتري حي ●</span>
+    <span style="color: #00e5ff; font-weight: bold;" id="tickerStatusText">بث تليمتري حي ●</span>
   </div>
 
   <!-- TAB 1: DASHBOARD (لوحة القيادة) -->
   <div id="tab-dashboard" class="tab-content active">
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
       <div class="glass-card">
-        <p style="font-size: 11px; color: #94a3b8;">محطات العمل النشطة</p>
+        <p style="font-size: 11px; color: #94a3b8;" id="cardKpiTitle1">محطات العمل النشطة</p>
         <h3 style="font-size: 22px; font-weight: 800; color: #00e5ff; margin-top: 4px;">42 / 50</h3>
-        <span class="badge badge-success" style="margin-top: 6px;">● 96% استقرار</span>
+        <span class="badge badge-success" style="margin-top: 6px;" id="cardKpiBadge1">● 96% استقرار</span>
       </div>
       <div class="glass-card">
-        <p style="font-size: 11px; color: #94a3b8;">معدل التركيز المؤسسي</p>
+        <p style="font-size: 11px; color: #94a3b8;" id="cardKpiTitle2">معدل التركيز المؤسسي</p>
         <h3 style="font-size: 22px; font-weight: 800; color: #a78bfa; margin-top: 4px;">94.8%</h3>
-        <span class="badge badge-success" style="margin-top: 6px;">▲ مرتفع جداً</span>
+        <span class="badge badge-success" style="margin-top: 6px;" id="cardKpiBadge2">▲ مرتفع جداً</span>
       </div>
     </div>
 
-    <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">تليمتري محطات العمل اللحظي</h3>
+    <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 10px;" id="secTelemetryTitle">تليمتري محطات العمل اللحظي</h3>
 
-    <div class="glass-card" style="border-right: 4px solid #00e5ff;">
+    <div class="glass-card" style="border-right: 4px solid #00e5ff;" id="cardEmpA">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px;">الموظف أ (الإدارة المالية)</span>
-        <span class="badge badge-success">نشط الآن</span>
+        <span style="font-weight: bold; font-size: 13px;" id="empAName">الموظف أ (الإدارة المالية)</span>
+        <span class="badge badge-success" id="empAStatus">نشط الآن</span>
       </div>
-      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;">البرنامج النشط: ERP Oracle Financials</p>
+      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;" id="empAApp">البرنامج النشط: ERP Oracle Financials</p>
       <div style="display: flex; justify-content: space-between; font-size: 11px; color: #00e5ff;">
-        <span>ساعات التركيز: 4.8 س</span>
-        <span>الإنتاجية: 98%</span>
+        <span id="empAFocus">ساعات التركيز: 4.8 س</span>
+        <span id="empAScore">الإنتاجية: 98%</span>
       </div>
     </div>
 
-    <div class="glass-card" style="border-right: 4px solid #8b5cf6;">
+    <div class="glass-card" style="border-right: 4px solid #8b5cf6;" id="cardEmpB">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px;">الموظف ب (الموارد البشرية)</span>
-        <span class="badge badge-success">نشط الآن</span>
+        <span style="font-weight: bold; font-size: 13px;" id="empBName">الموظف ب (الموارد البشرية)</span>
+        <span class="badge badge-success" id="empBStatus">نشط الآن</span>
       </div>
-      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;">البرنامج النشط: ATS Resume Scanner</p>
+      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;" id="empBApp">البرنامج النشط: ATS Resume Scanner</p>
       <div style="display: flex; justify-content: space-between; font-size: 11px; color: #00e5ff;">
-        <span>ساعات التركيز: 3.9 س</span>
-        <span>الإنتاجية: 94%</span>
+        <span id="empBFocus">ساعات التركيز: 3.9 س</span>
+        <span id="empBScore">الإنتاجية: 94%</span>
       </div>
     </div>
   </div>
@@ -332,38 +355,38 @@
   <div id="tab-compliance" class="tab-content">
     <div class="glass-card" style="text-align: center; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08);">
       <div style="font-size: 32px; margin-bottom: 6px;">⚖️</div>
-      <h2 style="font-size: 16px; font-weight: 800; color: #f87171;">رادار كشف مخالفات السياسات</h2>
-      <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">متوافق مع ضوابط حوكمة البيانات NDMO و ISO-27001</p>
+      <h2 style="font-size: 16px; font-weight: 800; color: #f87171;" id="radarTitle">رادار كشف مخالفات السياسات</h2>
+      <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;" id="radarSub">متوافق مع ضوابط حوكمة البيانات NDMO و ISO-27001</p>
     </div>
 
     <div class="glass-card" style="border-right: 4px solid #ef4444;">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px; color: #fca5a5;">محاولة نسخ ملفات مالية غير مصرحة</span>
-        <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171;">حرج</span>
+        <span style="font-weight: bold; font-size: 13px; color: #fca5a5;" id="violationItemTitle">محاولة نسخ ملفات مالية غير مصرحة</span>
+        <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171;" id="violationItemSeverity">حرج</span>
       </div>
-      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;">محطة: PC-FIN-04 • الوقت: منذ 10 دقائق</p>
-      <p style="font-size: 11px; color: #f87171;">الإجراء: تم الحظر فورياً وإشعار الإدارة.</p>
+      <p style="font-size: 11px; color: #94a3b8; margin: 4px 0;" id="violationItemStation">محطة: PC-FIN-04 • الوقت: منذ 10 دقائق</p>
+      <p style="font-size: 11px; color: #f87171;" id="violationItemAction">الإجراء: تم الحظر فورياً وإشعار الإدارة.</p>
     </div>
   </div>
 
   <!-- TAB 3: AI HIRING (التوظيف) -->
   <div id="tab-hiring" class="tab-content">
     <div class="glass-card">
-      <h3 style="font-size: 14px; font-weight: 800; color: #00e5ff; margin-bottom: 8px;">🤖 فحص وتدقيق السير الذاتية بالذكاء الاصطناعي</h3>
-      <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;">ارفع السيرة الذاتية لتدقيق المؤهلات فورياً دون استهلاك ذاكرة الهاتف:</p>
+      <h3 style="font-size: 14px; font-weight: 800; color: #00e5ff; margin-bottom: 8px;" id="hiringTitle">🤖 فحص وتدقيق السير الذاتية بالذكاء الاصطناعي</h3>
+      <p style="font-size: 11px; color: #94a3b8; margin-bottom: 12px;" id="hiringSub">ارفع السيرة الذاتية لتدقيق المؤهلات فورياً دون استهلاك ذاكرة الهاتف:</p>
       
       <div style="border: 2px dashed rgba(0,229,255,0.4); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;" onclick="document.getElementById('cvInput').click()">
         <input type="file" id="cvInput" style="display: none;" onchange="handleCvUpload(this)">
         <div style="font-size: 28px; margin-bottom: 6px;">📄</div>
-        <p style="font-size: 12px; font-weight: bold; color: #fff;">اضغط لرفع السيرة الذاتية (PDF/DOCX)</p>
+        <p style="font-size: 12px; font-weight: bold; color: #fff;" id="hiringUploadBtnText">اضغط لرفع السيرة الذاتية (PDF/DOCX)</p>
       </div>
 
       <div id="cvScanResult" style="display: none; margin-top: 14px; background: #050d25; padding: 12px; border-radius: 10px; border: 1px solid #00e5ff;">
         <div style="display: flex; justify-content: space-between;">
           <span style="font-weight: bold; font-size: 13px; color: #fff;" id="candidateNameTitle">مرشح: م. أحمد</span>
-          <span class="badge badge-success">مطابقة: 96%</span>
+          <span class="badge badge-success" id="candidateMatchScore">مطابقة: 96%</span>
         </div>
-        <p style="font-size: 11px; color: #00e5ff; margin-top: 4px;">القرار: موصى بالمقابلة الفورية</p>
+        <p style="font-size: 11px; color: #00e5ff; margin-top: 4px;" id="candidateVerdict">القرار: موصى بالمقابلة الفورية</p>
       </div>
     </div>
   </div>
@@ -371,35 +394,35 @@
   <!-- TAB 4: DEPARTMENTS (الأقسام) -->
   <div id="tab-departments" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-      <h3 style="font-size: 14px; font-weight: bold; color: #fff;">أقسام وهيكلة الموظفين</h3>
-      <button type="button" class="btn btn-primary" onclick="openAddEmployeeModal()">+ إضافة موظف</button>
+      <h3 style="font-size: 14px; font-weight: bold; color: #fff;" id="deptMainTitle">أقسام وهيكلة الموظفين</h3>
+      <button type="button" class="btn btn-primary" onclick="openAddEmployeeModal()" id="btnOpenAddEmp">+ إضافة موظف</button>
     </div>
 
     <div class="glass-card">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px;">الإدارة المالية والمحاسبة</span>
-        <span class="badge badge-success">12 موظفاً</span>
+        <span style="font-weight: bold; font-size: 13px;" id="dept1Title">الإدارة المالية والمحاسبة</span>
+        <span class="badge badge-success" id="dept1Count">12 موظفاً</span>
       </div>
     </div>
     <div class="glass-card">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px;">الموارد البشرية والتوظيف</span>
-        <span class="badge badge-success">8 موظفين</span>
+        <span style="font-weight: bold; font-size: 13px;" id="dept2Title">الموارد البشرية والتوظيف</span>
+        <span class="badge badge-success" id="dept2Count">8 موظفين</span>
       </div>
     </div>
   </div>
 
   <!-- TAB 5: DEALS (الصفقات والمكافآت) -->
   <div id="tab-deals" class="tab-content">
-    <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px;">الصفقات والمكافآت التنفيذية</h3>
+    <h3 style="font-size: 14px; font-weight: bold; margin-bottom: 12px;" id="dealsMainTitle">الصفقات والمكافآت التنفيذية</h3>
 
     <div class="glass-card" style="border-right: 4px solid #22c55e;">
       <div style="display: flex; justify-content: space-between;">
-        <span style="font-weight: bold; font-size: 13px;">صفقة التوريد السنوية</span>
+        <span style="font-weight: bold; font-size: 13px;" id="dealItemTitle">صفقة التوريد السنوية</span>
         <span class="badge badge-success" id="dealVal1">120,000 SAR</span>
       </div>
       <div style="display: flex; justify-content: space-between; font-size: 11px; color: #4ade80; margin-top: 6px;">
-        <span>المكافأة التنفيذية:</span>
+        <span id="dealBonusLabel">المكافأة التنفيذية:</span>
         <strong id="bonusVal1">+ 6,000 SAR</strong>
       </div>
     </div>
@@ -408,8 +431,8 @@
   <!-- TAB 6: SECURITY (الأمان والترخيص) -->
   <div id="tab-security" class="tab-content">
     <div class="glass-card">
-      <h3 style="font-size: 14px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;">🛡️ حالة الترخيص السيادي</h3>
-      <div style="font-size: 11px; color: #94a3b8; line-height: 1.6;">
+      <h3 style="font-size: 14px; font-weight: bold; color: #00e5ff; margin-bottom: 8px;" id="secTitle">🛡️ حالة الترخيص السيادي</h3>
+      <div style="font-size: 11px; color: #94a3b8; line-height: 1.7;" id="secDetails">
         • نوع الترخيص: <strong>ترخيص دائم مدى الحياة (Perpetual)</strong><br>
         • رقم التسجيل: <code>CP-SOV-2025-9948-LIFETIME</code><br>
         • التشفير: <strong>E2EE Kyber-1024</strong><br>
@@ -422,29 +445,57 @@
   <nav class="bottom-bar">
     <button type="button" class="nav-item active" onclick="switchTab('dashboard', this)">
       <span class="nav-icon">🏠</span>
-      <span>الرئيسية</span>
+      <span id="navLbl1">الرئيسية</span>
     </button>
     <button type="button" class="nav-item" onclick="switchTab('compliance', this)">
       <span class="nav-icon">⚖️</span>
-      <span>المخالفات</span>
+      <span id="navLbl2">المخالفات</span>
     </button>
     <button type="button" class="nav-item" onclick="switchTab('hiring', this)">
       <span class="nav-icon">🤖</span>
-      <span>التوظيف</span>
+      <span id="navLbl3">التوظيف</span>
     </button>
     <button type="button" class="nav-item" onclick="switchTab('departments', this)">
       <span class="nav-icon">🏢</span>
-      <span>الأقسام</span>
+      <span id="navLbl4">الأقسام</span>
     </button>
     <button type="button" class="nav-item" onclick="switchTab('deals', this)">
       <span class="nav-icon">💰</span>
-      <span>الصفقات</span>
+      <span id="navLbl5">الصفقات</span>
     </button>
     <button type="button" class="nav-item" onclick="switchTab('security', this)">
       <span class="nav-icon">🛡️</span>
-      <span>الأمان</span>
+      <span id="navLbl6">الأمان</span>
     </button>
   </nav>
+
+  <!-- نافذة تثبيت التطبيق الإرشادية الذكية -->
+  <div id="installModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 16px; font-weight: 800; color: #00e5ff;" id="installModalHead">📲 تثبيت CEO-Pulse على جهازك</h3>
+        <button type="button" onclick="closeModal('installModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; padding: 14px; font-size: 12px; line-height: 1.7; color: #e2e8f0; margin-bottom: 14px;" id="installModalBody">
+        <strong>📱 لهواتف الأندرويد وفيفو (Vivo Browser / Chrome):</strong><br>
+        1. اضغط على القائمة (⋮) أو خيارات المتصفح.<br>
+        2. اختر: <strong>«تثبيت التطبيق»</strong> أو <strong>«إضافة إلى الشاشة الرئيسية»</strong>.<br>
+        3. ستظهر أيقونة التطبيق السيادية فوراً على شاشتك!<br><br>
+        <strong>🍏 لهواتف الآيفون (Safari):</strong><br>
+        اضغط زر المشاركة (⎋) ثم <strong>«Add to Home Screen»</strong>.
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-primary" style="flex: 1; padding: 11px;" onclick="triggerNativeInstallPrompt()">
+          تثبيت فوري
+        </button>
+        <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 11px;" onclick="closeModal('installModal')">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Super-Admin / Kill-Switch Modal (PIN: 9900) -->
   <div id="adminModal" class="modal-overlay">
@@ -496,11 +547,202 @@
     let enteredPin = "";
     let correctPin = localStorage.getItem("ceo_master_pin") || "1234";
     const masterSuperKey = "9900";
+    let deferredPrompt = null;
 
+    // Currency Multipliers relative to SAR
     const rates = {
-      SAR: 1, USD: 0.27, EUR: 0.25, AED: 0.98, QAR: 0.97, KWD: 0.082, DZD: 36.2
+      SAR: 1, USD: 0.27, EUR: 0.25, AED: 0.98, QAR: 0.97,
+      KWD: 0.082, BHD: 0.10, OMR: 0.10, DZD: 36.2, MAD: 2.68,
+      EGP: 13.2, GBP: 0.21, CHF: 0.24, JPY: 40.5
     };
 
+    // Dictionary for 8 languages
+    const i18n = {
+      ar: {
+        dir: 'rtl',
+        orgName: 'المؤسسة الوطنية القابضة',
+        subTitle: 'بوابة القيادة السيادية المشفرة',
+        btnClear: 'مسح', btnEnter: 'دخول', btnBypass: '⚡ فتح التطبيق والدخول المباشر (1234)',
+        adminBtn: '🛡️ المشرف', tickerCloud: 'سحابة باريس AWS (مشفرة E2EE)', tickerStatus: 'بث تليمتري حي ●',
+        kpiTitle1: 'محطات العمل النشطة', kpiBadge1: '● 96% استقرار',
+        kpiTitle2: 'معدل التركيز المؤسسي', kpiBadge2: '▲ مرتفع جداً',
+        secTelemetry: 'تليمتري محطات العمل اللحظي',
+        empAName: 'الموظف أ (الإدارة المالية)', empAStatus: 'نشط الآن', empAApp: 'البرنامج النشط: ERP Oracle Financials', empAFocus: 'ساعات التركيز: 4.8 س', empAScore: 'الإنتاجية: 98%',
+        empBName: 'الموظف ب (الموارد البشرية)', empBStatus: 'نشط الآن', empBApp: 'البرنامج النشط: ATS Resume Scanner', empBFocus: 'ساعات التركيز: 3.9 س', empBScore: 'الإنتاجية: 94%',
+        radarTitle: 'رادار كشف مخالفات السياسات', radarSub: 'متوافق مع ضوابط حوكمة البيانات NDMO و ISO-27001',
+        violTitle: 'محاولة نسخ ملفات مالية غير مصرحة', violSev: 'حرج', violStation: 'محطة: PC-FIN-04 • الوقت: منذ 10 دقائق', violAction: 'الإجراء: تم الحظر فورياً وإشعار الإدارة.',
+        hiringTitle: '🤖 فحص وتدقيق السير الذاتية بالذكاء الاصطناعي', hiringSub: 'ارفع السيرة الذاتية لتدقيق المؤهلات فورياً دون استهلاك ذاكرة الهاتف:', hiringUploadBtn: 'اضغط لرفع السيرة الذاتية (PDF/DOCX)',
+        deptTitle: 'أقسام وهيكلة الموظفين', addEmpBtn: '+ إضافة موظف', dept1: 'الإدارة المالية والمحاسبة', dept1Cnt: '12 موظفاً', dept2: 'الموارد البشرية والتوظيف', dept2Cnt: '8 موظفين',
+        dealsTitle: 'الصفقات والمكافآت التنفيذية', dealItem: 'صفقة التوريد السنوية', dealBonus: 'المكافأة التنفيذية:',
+        secTitle: '🛡️ حالة الترخيص السيادي',
+        nav: ['الرئيسية', 'المخالفات', 'التوظيف', 'الأقسام', 'الصفقات', 'الأمان']
+      },
+      en: {
+        dir: 'ltr',
+        orgName: 'National Holding Enterprise',
+        subTitle: 'Sovereign Encrypted Executive Gateway',
+        btnClear: 'Clear', btnEnter: 'Enter', btnBypass: '⚡ Instant Executive Access (1234)',
+        adminBtn: '🛡️ Admin', tickerCloud: 'Paris AWS Cloud (E2EE Encrypted)', tickerStatus: 'Live Telemetry ●',
+        kpiTitle1: 'Active Workstations', kpiBadge1: '● 96% Stability',
+        kpiTitle2: 'Enterprise Focus Rate', kpiBadge2: '▲ Peak Momentum',
+        secTelemetry: 'Real-Time Workstation Telemetry',
+        empAName: 'Employee A (Finance Dept)', empAStatus: 'Active Now', empAApp: 'Active App: ERP Oracle Financials', empAFocus: 'Focus: 4.8 hrs', empAScore: 'Productivity: 98%',
+        empBName: 'Employee B (Human Resources)', empBStatus: 'Active Now', empBApp: 'Active App: ATS Resume Scanner', empBFocus: 'Focus: 3.9 hrs', empBScore: 'Productivity: 94%',
+        radarTitle: 'AI Policy & Compliance Radar', radarSub: 'Conforming to NDMO & ISO-27001 Governance Standards',
+        violTitle: 'Unauthorized Financial Data Export Attempt', violSev: 'CRITICAL', violStation: 'Node: PC-FIN-04 • 10m ago', violAction: 'Action: Port blocked immediately, executive alert dispatched.',
+        hiringTitle: '🤖 AI Forensic Candidate Screening', hiringSub: 'Upload resume to analyze qualifications securely via cloud backend:', hiringUploadBtn: 'Click to Upload Resume (PDF/DOCX)',
+        deptTitle: 'Department Structure & Staff', addEmpBtn: '+ Add Employee', dept1: 'Financial & Accounting Division', dept1Cnt: '12 Staff', dept2: 'Human Resources & Talent', dept2Cnt: '8 Staff',
+        dealsTitle: 'High-Value Deals & Executive Bonuses', dealItem: 'Annual Enterprise Procurement Deal', dealBonus: 'Executive Bonus:',
+        secTitle: '🛡️ Sovereign License Integrity',
+        nav: ['Dashboard', 'Compliance', 'AI Hiring', 'Depts', 'Deals', 'Security']
+      },
+      fr: {
+        dir: 'ltr',
+        orgName: 'Holding National Souverain',
+        subTitle: 'Passerelle Exécutive Chiffrée Souveraine',
+        btnClear: 'Effacer', btnEnter: 'Entrer', btnBypass: '⚡ Accès Direct Exécutif (1234)',
+        adminBtn: '🛡️ Admin', tickerCloud: 'Cloud AWS Paris (Chiffré E2EE)', tickerStatus: 'Télémétrie en Direct ●',
+        kpiTitle1: 'Postes Actifs', kpiBadge1: '● 96% Stabilité',
+        kpiTitle2: 'Indice de Concentration', kpiBadge2: '▲ Très Élevé',
+        secTelemetry: 'Télémétrie des Postes en Temps Réel',
+        empAName: 'Employé A (Département Finance)', empAStatus: 'Actif', empAApp: 'App Active: ERP Oracle Financials', empAFocus: 'Focus: 4.8 h', empAScore: 'Productivité: 98%',
+        empBName: 'Employé B (Ressources Humaines)', empBStatus: 'Actif', empBApp: 'App Active: ATS Resume Scanner', empBFocus: 'Focus: 3.9 h', empBScore: 'Productivité: 94%',
+        radarTitle: 'Radar IA de Conformité et Politiques', radarSub: 'Conforme aux normes RGPD et ISO-27001',
+        violTitle: 'Tentative d’export de fichiers financiers', violSev: 'CRITIQUE', violStation: 'Poste: PC-FIN-04 • Il y a 10 min', violAction: 'Action: Port bloqué et alerte envoyée à la direction.',
+        hiringTitle: '🤖 Analyse IA Sécurisée de CV', hiringSub: 'Téléversez le CV pour audit automatique sans saturer le mobile:', hiringUploadBtn: 'Cliquer pour Téléverser le CV (PDF)',
+        deptTitle: 'Structure des Départements', addEmpBtn: '+ Ajouter Employé', dept1: 'Direction Financière & Comptabilité', dept1Cnt: '12 Employés', dept2: 'Ressources Humaines', dept2Cnt: '8 Employés',
+        dealsTitle: 'Affaires Stratégiques & Primes', dealItem: 'Contrat d’Approvisionnement Annuel', dealBonus: 'Prime Exécutive:',
+        secTitle: '🛡️ Licence Souveraine & Sécurité',
+        nav: ['Cockpit', 'Conformité', 'Recrutement', 'Départements', 'Primes', 'Sécurité']
+      },
+      es: {
+        dir: 'ltr',
+        orgName: 'Holding Nacional Corporativo',
+        subTitle: 'Portal Ejecutivo Cifrado Soberano',
+        btnClear: 'Borrar', btnEnter: 'Entrar', btnBypass: '⚡ Acceso Ejecutivo Inmediato (1234)',
+        adminBtn: '🛡️ Admin', tickerCloud: 'Nube AWS París (Cifrada E2EE)', tickerStatus: 'Telemetría en Vivo ●',
+        kpiTitle1: 'Estaciones Activas', kpiBadge1: '● 96% Estabilidad',
+        kpiTitle2: 'Tasa de Concentración', kpiBadge2: '▲ Muy Alta',
+        secTelemetry: 'Telemetría de Estaciones en Tiempo Real',
+        empAName: 'Empleado A (Finanzas)', empAStatus: 'Activo Ahora', empAApp: 'App Activa: ERP Oracle Financials', empAFocus: 'Enfoque: 4.8 h', empAScore: 'Productividad: 98%',
+        empBName: 'Empleado B (Recursos Humanos)', empBStatus: 'Activo Ahora', empBApp: 'App Activa: ATS Resume Scanner', empBFocus: 'Enfoque: 3.9 h', empBScore: 'Productividad: 94%',
+        radarTitle: 'Radar IA de Cumplimiento Normativo', radarSub: 'Conforme con ISO-27001 y protección de datos',
+        violTitle: 'Intento no autorizado de copia de datos', violSev: 'CRÍTICO', violStation: 'Nodo: PC-FIN-04 • Hace 10 min', violAction: 'Acción: Bloqueo inmediato y aviso a gerencia.',
+        hiringTitle: '🤖 Auditoría Forense de CV con IA', hiringSub: 'Suba el currículum para evaluar competencias en la nube:', hiringUploadBtn: 'Subir Currículum (PDF/DOCX)',
+        deptTitle: 'Departamentos y Personal', addEmpBtn: '+ Empleado', dept1: 'Administración Financiera', dept1Cnt: '12 Miembros', dept2: 'Recursos Humanos', dept2Cnt: '8 Miembros',
+        dealsTitle: 'Acuerdos Comerciales y Bonificaciones', dealItem: 'Contrato Anual de Suministro', dealBonus: 'Bono Ejecutivo:',
+        secTitle: '🛡️ Estado de Licencia Soberana',
+        nav: ['Inicio', 'Cumplimiento', 'Selección', 'Deptos', 'Acuerdos', 'Seguridad']
+      },
+      de: {
+        dir: 'ltr',
+        orgName: 'Nationale Holding Gesellschaft',
+        subTitle: 'Souveränes Verschlüsseltes Führungsportal',
+        btnClear: 'Löschen', btnEnter: 'Eingabe', btnBypass: '⚡ Sofortiger Zugang (1234)',
+        adminBtn: '🛡️ Admin', tickerCloud: 'Paris AWS Cloud (E2EE)', tickerStatus: 'Live-Telemetrie ●',
+        kpiTitle1: 'Aktive Arbeitsstationen', kpiBadge1: '● 96% Stabilität',
+        kpiTitle2: 'Unternehmensfokus', kpiBadge2: '▲ Sehr Hoch',
+        secTelemetry: 'Echtzeit-Telemetrie der Arbeitsstationen',
+        empAName: 'Mitarbeiter A (Finanzen)', empAStatus: 'Aktiv', empAApp: 'Aktive App: ERP Oracle Financials', empAFocus: 'Fokus: 4.8 h', empAScore: 'Produktivität: 98%',
+        empBName: 'Mitarbeiter B (Personalabteilung)', empBStatus: 'Aktiv', empBApp: 'Aktive App: ATS Resume Scanner', empBFocus: 'Fokus: 3.9 h', empBScore: 'Produktivität: 94%',
+        radarTitle: 'KI-Richtlinien- und Compliance-Radar', radarSub: 'Konform mit ISO-27001 Sicherheitsstandards',
+        violTitle: 'Unerlaubter Finanzdatenexport', violSev: 'KRITISCH', violStation: 'Station: PC-FIN-04 • Vor 10 Min', violAction: 'Aktion: Zugriff blockiert und Vorstand alarmiert.',
+        hiringTitle: '🤖 KI-Bewerberprüfung & CV-Scan', hiringSub: 'Laden Sie den Lebenslauf hoch für Cloud-Analyse:', hiringUploadBtn: 'Lebenslauf hochladen (PDF)',
+        deptTitle: 'Abteilungsstruktur', addEmpBtn: '+ Mitarbeiter', dept1: 'Finanz- und Rechnungswesen', dept1Cnt: '12 Mitarbeiter', dept2: 'Personalwesen', dept2Cnt: '8 Mitarbeiter',
+        dealsTitle: 'Deals & Leistungsboni', dealItem: 'Jährlicher Liefervertrag', dealBonus: 'Prämie:',
+        secTitle: '🛡️ Souveräner Lizenzstatus',
+        nav: ['Übersicht', 'Compliance', 'Recruiting', 'Abteilungen', 'Deals', 'Sicherheit']
+      },
+      zh: {
+        dir: 'ltr',
+        orgName: '国家控股集团',
+        subTitle: '主权加密高管决策系统',
+        btnClear: '清除', btnEnter: '进入', btnBypass: '⚡ 高管快捷登录 (1234)',
+        adminBtn: '🛡️ 管理员', tickerCloud: '巴黎 AWS 云节点 (E2EE加密)', tickerStatus: '实时遥测中 ●',
+        kpiTitle1: '活跃工作站', kpiBadge1: '● 96% 稳定性',
+        kpiTitle2: '企业专注度', kpiBadge2: '▲ 峰值运转',
+        secTelemetry: '实时工作站遥测中心',
+        empAName: '员工 A (财务部)', empAStatus: '正在活跃', empAApp: '运行应用: ERP Oracle Financials', empAFocus: '专注时长: 4.8 小时', empAScore: '效率指数: 98%',
+        empBName: '员工 B (人力资源部)', empBStatus: '正在活跃', empBApp: '运行应用: ATS Resume Scanner', empBFocus: '专注时长: 3.9 小时', empBScore: '效率指数: 94%',
+        radarTitle: 'AI 合规与违规监测雷达', radarSub: '符合 ISO-27001 数据治理标准',
+        violTitle: '未经授权导出财务文件尝试', violSev: '严重', violStation: '节点: PC-FIN-04 • 10分钟前', violAction: '措施: 已立刻封锁端口并上报管理层。',
+        hiringTitle: '🤖 AI 简历智能深度审计', hiringSub: '上传简历以通过云端深度匹配，不消耗手机内存:', hiringUploadBtn: '点击上传简历 (PDF/DOCX)',
+        deptTitle: '公司组织架构', addEmpBtn: '+ 新增员工', dept1: '财务与会计部', dept1Cnt: '12 人', dept2: '人力资源与招聘部', dept2Cnt: '8 人',
+        dealsTitle: '高管大单与绩效奖金', dealItem: '年度集团集采大单', dealBonus: '执行奖金:',
+        secTitle: '🛡️ 主权永久授权状态',
+        nav: ['仪表盘', '合规', '招聘', '部门', '交易', '安全']
+      },
+      ru: {
+        dir: 'ltr',
+        orgName: 'Национальный Холдинг',
+        subTitle: 'Суверенный зашифрованный исполнительный шлюз',
+        btnClear: 'Очистить', btnEnter: 'Войти', btnBypass: '⚡ Мгновенный вход CEO (1234)',
+        adminBtn: '🛡️ Админ', tickerCloud: 'Облако AWS Париж (E2EE шифрование)', tickerStatus: 'Телеметрия онлайн ●',
+        kpiTitle1: 'Активные станции', kpiBadge1: '● 96% стабильность',
+        kpiTitle2: 'Уровень фокуса', kpiBadge2: '▲ Высокий',
+        secTelemetry: 'Телеметрия рабочих станций в реальном времени',
+        empAName: 'Сотрудник А (Финансы)', empAStatus: 'Активен', empAApp: 'Активное ПО: ERP Oracle Financials', empAFocus: 'Фокус: 4.8 ч', empAScore: 'Продуктивность: 98%',
+        empBName: 'Сотрудник Б (Кадры)', empBStatus: 'Активен', empBApp: 'Активное ПО: ATS Resume Scanner', empBFocus: 'Фокус: 3.9 ч', empBScore: 'Продуктивность: 94%',
+        radarTitle: 'ИИ Радар Соответствия и Нарушений', radarSub: 'Соответствует стандартам ISO-27001',
+        violTitle: 'Попытка несанкционированного скачивания данных', violSev: 'КРИТИЧЕСКИЙ', violStation: 'Узел: PC-FIN-04 • 10 мин назад', violAction: 'Действие: Порт заблокирован, уведомлен CEO.',
+        hiringTitle: '🤖 ИИ Анализ и Скрининг Резюме', hiringSub: 'Загрузите резюме для безопасного облачного аудита:', hiringUploadBtn: 'Загрузить резюме (PDF/DOCX)',
+        deptTitle: 'Структура подразделений', addEmpBtn: '+ Сотрудник', dept1: 'Финансовый департамент', dept1Cnt: '12 чел', dept2: 'Департамент кадров', dept2Cnt: '8 чел',
+        dealsTitle: 'Крупные сделки и бонусы', dealItem: 'Годовой контракт на поставку', dealBonus: 'Бонус:',
+        secTitle: '🛡️ Суверенный статус лицензии',
+        nav: ['Главная', 'Нарушения', 'Рекрутинг', 'Отделы', 'Сделки', 'Защита']
+      },
+      tr: {
+        dir: 'ltr',
+        orgName: 'Ulusal Holding Kuruluşu',
+        subTitle: 'Egemen Şifreli Yönetici Portalı',
+        btnClear: 'Sil', btnEnter: 'Giriş', btnBypass: '⚡ Hızlı Yönetici Girişi (1234)',
+        adminBtn: '🛡️ Yönetici', tickerCloud: 'Paris AWS Bulutu (E2EE Şifreli)', tickerStatus: 'Canlı Telemetri ●',
+        kpiTitle1: 'Aktif İstasyonlar', kpiBadge1: '● %96 Kararlılık',
+        kpiTitle2: 'Kurumsal Odak Oranı', kpiBadge2: '▲ Çok Yüksek',
+        secTelemetry: 'Gerçek Zamanlı İstasyon Telemetrisi',
+        empAName: 'Çalışan A (Finans Departmanı)', empAStatus: 'Şimdi Aktif', empAApp: 'Aktif Uygulama: ERP Oracle Financials', empAFocus: 'Odak: 4.8 sa', empAScore: 'Verimlilik: %98',
+        empBName: 'Çalışan B (İnsan Kaynakları)', empBStatus: 'Şimdi Aktif', empBApp: 'Aktif Uygulama: ATS Resume Scanner', empBFocus: 'Odak: 3.9 sa', empBScore: 'Verimlilik: %94',
+        radarTitle: 'Yapay Zeka Politika ve Uyum Radarı', radarSub: 'ISO-27001 standartlarına tam uyumlu',
+        violTitle: 'İzinsiz Finansal Veri Çekme Girişimi', violSev: 'KRİTİK', violStation: 'Düğüm: PC-FIN-04 • 10 dk önce', violAction: 'İşlem: Port engellendi, yöneticiye bildirildi.',
+        hiringTitle: '🤖 Yapay Zeka ile CV İnceleme', hiringSub: 'Telefondan bellek harcamadan bulutta CV analizi:', hiringUploadBtn: 'CV Yüklemek İçin Tıklayın (PDF)',
+        deptTitle: 'Departman Yapısı ve Personel', addEmpBtn: '+ Çalışan Ekle', dept1: 'Mali İşler ve Muhasebe', dept1Cnt: '12 Personel', dept2: 'İnsan Kaynakları', dept2Cnt: '8 Personel',
+        dealsTitle: 'Büyük Anlaşmalar ve Primler', dealItem: 'Yıllık Tedarik Anlaşması', dealBonus: 'Yönetici Primi:',
+        secTitle: '🛡️ Egemen Lisans Durumu',
+        nav: ['Panel', 'Uyum', 'İşe Alım', 'Bölümler', 'Anlaşmalar', 'Güvenlik']
+      }
+    };
+
+    // PWA Install Event Handler
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('CEO-Pulse install prompt registered');
+    });
+
+    function handleInstallClick() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User installed CEO-Pulse app');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        openModal('installModal');
+      }
+    }
+
+    function triggerNativeInstallPrompt() {
+      if (deferredPrompt) {
+        handleInstallClick();
+        closeModal('installModal');
+      } else {
+        alert("💡 من خيارات المتصفح (⋮) أو زر المشاركة (⎋)، اضغط: «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».");
+      }
+    }
+
+    // Keypad Logic
     function pressKey(num) {
       if (enteredPin.length < 4) {
         enteredPin += num;
@@ -545,6 +787,7 @@
       }
     }
 
+    // Tab Switching
     function switchTab(tabId, btn) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
@@ -554,6 +797,7 @@
       if (btn) btn.classList.add("active");
     }
 
+    // Currency Switcher
     function changeCurrency(curr) {
       const rate = rates[curr] || 1;
       const d1 = (120000 * rate).toLocaleString(undefined, {maximumFractionDigits: 0});
@@ -564,8 +808,67 @@
       if (el2) el2.innerText = "+ " + b1 + " " + curr;
     }
 
+    // Full Real-time Translation across all elements
     function changeLanguage(lang) {
-      console.log('Language switched:', lang);
+      const dict = i18n[lang] || i18n['ar'];
+      document.documentElement.lang = lang;
+      document.documentElement.dir = dict.dir;
+
+      const setT = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+
+      setT('headerOrgName', dict.orgName);
+      setT('lockSubTitle', dict.subTitle);
+      setT('btnKeyClear', dict.btnClear);
+      setT('btnKeyEnter', dict.btnEnter);
+      setT('btnDirectBypass', dict.btnBypass);
+      setT('btnHeaderAdmin', dict.adminBtn);
+      setT('tickerCloudText', dict.tickerCloud);
+      setT('tickerStatusText', dict.tickerStatus);
+
+      setT('cardKpiTitle1', dict.kpiTitle1);
+      setT('cardKpiBadge1', dict.kpiBadge1);
+      setT('cardKpiTitle2', dict.kpiTitle2);
+      setT('cardKpiBadge2', dict.kpiBadge2);
+      setT('secTelemetryTitle', dict.secTelemetry);
+
+      setT('empAName', dict.empAName);
+      setT('empAStatus', dict.empAStatus);
+      setT('empAApp', dict.empAApp);
+      setT('empAFocus', dict.empAFocus);
+      setT('empAScore', dict.empAScore);
+
+      setT('empBName', dict.empBName);
+      setT('empBStatus', dict.empBStatus);
+      setT('empBApp', dict.empBApp);
+      setT('empBFocus', dict.empBFocus);
+      setT('empBScore', dict.empBScore);
+
+      setT('radarTitle', dict.radarTitle);
+      setT('radarSub', dict.radarSub);
+      setT('violationItemTitle', dict.violTitle);
+      setT('violationItemSeverity', dict.violSev);
+      setT('violationItemStation', dict.violStation);
+      setT('violationItemAction', dict.violAction);
+
+      setT('hiringTitle', dict.hiringTitle);
+      setT('hiringSub', dict.hiringSub);
+      setT('hiringUploadBtnText', dict.hiringUploadBtn);
+
+      setT('deptMainTitle', dict.deptTitle);
+      setT('btnOpenAddEmp', dict.addEmpBtn);
+      setT('dept1Title', dict.dept1);
+      setT('dept1Count', dict.dept1Cnt);
+      setT('dept2Title', dict.dept2);
+      setT('dept2Count', dict.dept2Cnt);
+
+      setT('dealsMainTitle', dict.dealsTitle);
+      setT('dealItemTitle', dict.dealItem);
+      setT('dealBonusLabel', dict.dealBonus);
+      setT('secTitle', dict.secTitle);
+
+      for (let i = 0; i < 6; i++) {
+        setT('navLbl' + (i + 1), dict.nav[i]);
+      }
     }
 
     function handleCvUpload(input) {

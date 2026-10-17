@@ -11,19 +11,28 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CEO-Pulse">
 
+  <!-- أيقونة الدرع السيادي بدقة فائقة -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23050d25'/><circle cx='256' cy='256' r='145' fill='%230a122a' stroke='%2300e5ff' stroke-width='6'/><path d='M140 256 L205 256 L230 190 L265 330 L295 220 L320 275 L340 256 L372 256' fill='none' stroke='%2300e5ff' stroke-width='18' stroke-linecap='round' stroke-linejoin='round'/><circle cx='372' cy='256' r='12' fill='%2300e5ff'/></svg>">
+
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(0, 229, 255, 0.2);
+      margin: 0;
+      padding: 0;
+    }
     body {
       background-color: #050d25;
       color: #f8fafc;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif;
       overflow-x: hidden;
-      padding-bottom: 90px;
+      padding-bottom: 95px;
+      touch-action: manipulation;
     }
     .neon-cyan { color: #00e5ff; }
     .glass-card {
-      background: rgba(10, 18, 42, 0.85);
-      border: 1px solid rgba(0, 229, 255, 0.2);
+      background: rgba(10, 18, 42, 0.9);
+      border: 1px solid rgba(0, 229, 255, 0.25);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
@@ -36,13 +45,15 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
       touch-action: manipulation;
+      user-select: none;
     }
-    .btn:active { opacity: 0.8; transform: scale(0.97); }
+    .btn:active { transform: scale(0.96); opacity: 0.85; }
     .btn-primary {
       background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
       color: #050d25;
-      padding: 10px 18px;
+      padding: 12px 20px;
       font-size: 14px;
     }
     .badge {
@@ -100,10 +111,11 @@
       right: 0;
       z-index: 50;
       background: #050d25;
-      border-top: 1px solid rgba(0, 229, 255, 0.3);
+      border-top: 1px solid rgba(0, 229, 255, 0.35);
       display: flex;
       justify-content: space-around;
       padding: 10px 4px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
     }
     .nav-item {
       display: flex;
@@ -118,21 +130,24 @@
       cursor: pointer;
       flex: 1;
       touch-action: manipulation;
+      user-select: none;
+      padding: 4px 0;
     }
     .nav-item.active { color: #00e5ff; }
-    .nav-icon { font-size: 20px; }
+    .nav-icon { font-size: 20px; pointer-events: none; }
 
     /* Lock Screen Overlay */
     #lockScreen {
       position: fixed;
       inset: 0;
-      z-index: 1000;
+      z-index: 9999;
       background: #050d25;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px;
+      touch-action: manipulation;
     }
     .pin-dots { display: flex; gap: 14px; margin: 20px 0; }
     .pin-dot {
@@ -144,13 +159,13 @@
     .pin-dot.filled { background: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 75px);
+      grid-template-columns: repeat(3, 76px);
       gap: 14px;
       margin-top: 10px;
     }
     .key-btn {
-      width: 75px;
-      height: 75px;
+      width: 76px;
+      height: 76px;
       border-radius: 50%;
       background: #0a122a;
       border: 1px solid rgba(0, 229, 255, 0.3);
@@ -162,6 +177,7 @@
       justify-content: center;
       cursor: pointer;
       touch-action: manipulation;
+      user-select: none;
     }
     .key-btn:active { background: #00e5ff; color: #050d25; }
 
@@ -169,12 +185,13 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      z-index: 2000;
+      z-index: 10000;
       background: rgba(0, 0, 0, 0.85);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      touch-action: manipulation;
     }
     .modal-overlay.active { display: flex; }
     .modal-box {
@@ -191,7 +208,7 @@
 
   <!-- External Sovereign Security Lock Screen (Default PIN: 1234) -->
   <div id="lockScreen">
-    <div class="shield-icon" style="width: 68px; height: 68px; font-size: 34px; margin-bottom: 12px; box-shadow: 0 0 25px rgba(0,229,255,0.4);">
+    <div class="shield-icon" style="width: 70px; height: 70px; font-size: 34px; margin-bottom: 12px; box-shadow: 0 0 25px rgba(0,229,255,0.4);">
       🛡️
     </div>
     <h2 style="font-size: 20px; font-weight: 800; color: #fff;">CEO-Pulse Enterprise</h2>
@@ -205,23 +222,23 @@
     </div>
 
     <div class="keypad">
-      <button class="key-btn" onclick="pressKey('1')">1</button>
-      <button class="key-btn" onclick="pressKey('2')">2</button>
-      <button class="key-btn" onclick="pressKey('3')">3</button>
-      <button class="key-btn" onclick="pressKey('4')">4</button>
-      <button class="key-btn" onclick="pressKey('5')">5</button>
-      <button class="key-btn" onclick="pressKey('6')">6</button>
-      <button class="key-btn" onclick="pressKey('7')">7</button>
-      <button class="key-btn" onclick="pressKey('8')">8</button>
-      <button class="key-btn" onclick="pressKey('9')">9</button>
-      <button class="key-btn" style="font-size: 14px;" onclick="clearPin()">مسح</button>
-      <button class="key-btn" onclick="pressKey('0')">0</button>
-      <button class="key-btn" style="font-size: 14px; background: rgba(0,229,255,0.25); color: #00e5ff;" onclick="unlockAppDirect()">دخول</button>
+      <button type="button" class="key-btn" onclick="pressKey('1')">1</button>
+      <button type="button" class="key-btn" onclick="pressKey('2')">2</button>
+      <button type="button" class="key-btn" onclick="pressKey('3')">3</button>
+      <button type="button" class="key-btn" onclick="pressKey('4')">4</button>
+      <button type="button" class="key-btn" onclick="pressKey('5')">5</button>
+      <button type="button" class="key-btn" onclick="pressKey('6')">6</button>
+      <button type="button" class="key-btn" onclick="pressKey('7')">7</button>
+      <button type="button" class="key-btn" onclick="pressKey('8')">8</button>
+      <button type="button" class="key-btn" onclick="pressKey('9')">9</button>
+      <button type="button" class="key-btn" style="font-size: 14px;" onclick="clearPin()">مسح</button>
+      <button type="button" class="key-btn" onclick="pressKey('0')">0</button>
+      <button type="button" class="key-btn" style="font-size: 14px; background: rgba(0,229,255,0.3); color: #00e5ff;" onclick="unlockAppDirect()">دخول</button>
     </div>
 
     <div style="margin-top: 22px; text-align: center;">
-      <button class="btn btn-primary" style="padding: 10px 22px; border-radius: 999px; font-size: 13px;" onclick="unlockAppDirect()">
-        ⚡ فتح التطبيق والدخول المباشر
+      <button type="button" class="btn btn-primary" style="padding: 12px 24px; border-radius: 999px; font-size: 14px; box-shadow: 0 0 20px rgba(0,229,255,0.3);" onclick="unlockAppDirect()">
+        ⚡ فتح التطبيق والدخول المباشر (1234)
       </button>
     </div>
   </div>
@@ -255,8 +272,8 @@
       </select>
 
       <!-- Lock & Master Super-Admin Buttons -->
-      <button class="btn" style="background: rgba(255,255,255,0.1); padding: 8px 10px; color: #fff;" onclick="lockAppNow()">🔒</button>
-      <button class="btn" style="background: rgba(0,229,255,0.2); border: 1px solid #00e5ff; padding: 8px 10px; color: #00e5ff;" onclick="openSuperAdminModal()">🛡️ المشرف</button>
+      <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 8px 10px; color: #fff;" onclick="lockAppNow()">🔒</button>
+      <button type="button" class="btn" style="background: rgba(0,229,255,0.2); border: 1px solid #00e5ff; padding: 8px 10px; color: #00e5ff;" onclick="openSuperAdminModal()">🛡️ المشرف</button>
     </div>
   </header>
 
@@ -355,7 +372,7 @@
   <div id="tab-departments" class="tab-content">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
       <h3 style="font-size: 14px; font-weight: bold; color: #fff;">أقسام وهيكلة الموظفين</h3>
-      <button class="btn btn-primary" onclick="openAddEmployeeModal()">+ إضافة موظف</button>
+      <button type="button" class="btn btn-primary" onclick="openAddEmployeeModal()">+ إضافة موظف</button>
     </div>
 
     <div class="glass-card">
@@ -401,29 +418,29 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar (6 Active Tabs) -->
+  <!-- Bottom Navigation Bar (6 Active Tabs with direct touch response) -->
   <nav class="bottom-bar">
-    <button class="nav-item active" onclick="switchTab('dashboard', this)">
+    <button type="button" class="nav-item active" onclick="switchTab('dashboard', this)">
       <span class="nav-icon">🏠</span>
       <span>الرئيسية</span>
     </button>
-    <button class="nav-item" onclick="switchTab('compliance', this)">
+    <button type="button" class="nav-item" onclick="switchTab('compliance', this)">
       <span class="nav-icon">⚖️</span>
       <span>المخالفات</span>
     </button>
-    <button class="nav-item" onclick="switchTab('hiring', this)">
+    <button type="button" class="nav-item" onclick="switchTab('hiring', this)">
       <span class="nav-icon">🤖</span>
       <span>التوظيف</span>
     </button>
-    <button class="nav-item" onclick="switchTab('departments', this)">
+    <button type="button" class="nav-item" onclick="switchTab('departments', this)">
       <span class="nav-icon">🏢</span>
       <span>الأقسام</span>
     </button>
-    <button class="nav-item" onclick="switchTab('deals', this)">
+    <button type="button" class="nav-item" onclick="switchTab('deals', this)">
       <span class="nav-icon">💰</span>
       <span>الصفقات</span>
     </button>
-    <button class="nav-item" onclick="switchTab('security', this)">
+    <button type="button" class="nav-item" onclick="switchTab('security', this)">
       <span class="nav-icon">🛡️</span>
       <span>الأمان</span>
     </button>
@@ -434,19 +451,19 @@
     <div class="modal-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="font-size: 16px; font-weight: 800; color: #00e5ff;">🛡️ خزينة المشرف (Master Vault)</h3>
-        <button onclick="closeModal('adminModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+        <button type="button" onclick="closeModal('adminModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
       <div id="adminLockState">
         <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">أدخل رمز المشرف السري (رمز التجميد والتحكم):</p>
         <input type="password" id="adminPinInput" placeholder="••••" style="width: 100%; background: #050d25; border: 1px solid rgba(0,229,255,0.4); border-radius: 10px; padding: 12px; color: #fff; text-align: center; font-size: 18px; outline: none;">
-        <button class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 12px;" onclick="verifyAdminPin()">التحقق من الصلاحية</button>
+        <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 12px;" onclick="verifyAdminPin()">التحقق من الصلاحية</button>
       </div>
 
       <div id="adminPanelState" style="display: none;">
         <div style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; border-radius: 10px; padding: 12px; margin-bottom: 12px;">
           <h4 style="font-size: 12px; font-weight: bold; color: #f87171;">⚠️ مفتاح التجميد الفوري (Kill-Switch)</h4>
-          <button class="btn" style="background: #ef4444; color: #fff; width: 100%; margin-top: 8px; padding: 10px; font-size: 12px;" onclick="triggerKillSwitch()">
+          <button type="button" class="btn" style="background: #ef4444; color: #fff; width: 100%; margin-top: 8px; padding: 10px; font-size: 12px;" onclick="triggerKillSwitch()">
             ⚡ تجميد ترخيص هذه المنشأة فوراً
           </button>
         </div>
@@ -454,7 +471,7 @@
         <div>
           <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">تغيير رمز الدخول الافتراضي:</label>
           <input type="text" id="newMasterPin" value="1234" style="width: 100%; background: #050d25; border: 1px solid rgba(0,229,255,0.3); border-radius: 8px; padding: 8px; color: #00e5ff; font-weight: bold; text-align: center;">
-          <button class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 8px; font-size: 12px;" onclick="saveNewPin()">حفظ الرمز</button>
+          <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 8px; font-size: 12px;" onclick="saveNewPin()">حفظ الرمز</button>
         </div>
       </div>
     </div>
@@ -465,12 +482,12 @@
     <div class="modal-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="font-size: 15px; font-weight: 800; color: #fff;">+ إضافة موظف</h3>
-        <button onclick="closeModal('addEmpModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+        <button type="button" onclick="closeModal('addEmpModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <input type="text" id="empNameInput" placeholder="اسم الموظف" style="width: 100%; background: #050d25; border: 1px solid rgba(0,229,255,0.3); border-radius: 8px; padding: 10px; color: #fff;">
-        <button class="btn btn-primary" style="padding: 10px;" onclick="saveEmployee()">حفظ الموظف</button>
+        <button type="button" class="btn btn-primary" style="padding: 10px;" onclick="saveEmployee()">حفظ الموظف</button>
       </div>
     </div>
   </div>
@@ -516,12 +533,16 @@
     }
     function unlockAppDirect() {
       const lock = document.getElementById("lockScreen");
-      if (lock) lock.style.display = "none";
+      if (lock) {
+        lock.style.setProperty('display', 'none', 'important');
+      }
     }
     function lockAppNow() {
       clearPin();
       const lock = document.getElementById("lockScreen");
-      if (lock) lock.style.display = "flex";
+      if (lock) {
+        lock.style.setProperty('display', 'flex', 'important');
+      }
     }
 
     function switchTab(tabId, btn) {

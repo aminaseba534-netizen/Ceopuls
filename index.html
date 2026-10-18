@@ -671,7 +671,7 @@
     }
 
     // ==========================================
-    // قاموس الترجمة الشامل لجميع اللغات الـ 8 🌐
+    // قاموس الترجمة الموحد والشامل لكافة اللغات الـ 8 🌐
     // ==========================================
     const i18n = {
       ar: {
@@ -873,8 +873,14 @@
       document.documentElement.lang = lang;
       document.documentElement.dir = dict.dir;
 
-      const setT = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
-      const setH = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+      const setT = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined) el.innerText = val;
+      };
+      const setH = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined) el.innerHTML = val;
+      };
 
       setT('headerOrgName', dict.orgName);
       setT('btnHeaderTenants', dict.tenantsBtn);
@@ -932,9 +938,11 @@
       setT('secTitle', dict.secTitle);
       setH('secDetails', dict.secDetails);
 
-      // تبديل لغة الأيقونات السفلية الست فورياً
-      for (let i = 0; i < 6; i++) {
-        setT('navLbl' + (i + 1), dict.nav[i]);
+      // تبديل لغة الأيقونات السفلية الست فورياً لأي لغة
+      if (dict.nav && Array.isArray(dict.nav)) {
+        for (let i = 0; i < 6; i++) {
+          setT('navLbl' + (i + 1), dict.nav[i]);
+        }
       }
     }
 

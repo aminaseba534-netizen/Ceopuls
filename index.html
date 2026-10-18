@@ -206,6 +206,8 @@
       width: 100%;
       max-width: 420px;
       padding: 22px;
+      max-height: 85vh;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -258,6 +260,11 @@
       </div>
     </div>
     <div class="controls">
+      <!-- زر الشركات المشتركة لعرض عددها وحالتها -->
+      <button type="button" class="btn" style="background: rgba(0,229,255,0.18); border: 1px solid rgba(0,229,255,0.4); color: #00e5ff; font-size: 11px; padding: 5px 8px;" onclick="openTenantsModal()">
+        🏢 الشركات
+      </button>
+
       <!-- كافة العملات الـ 14 -->
       <select id="currencySelect" onchange="changeCurrency(this.value)">
         <option value="SAR">SAR 🇸🇦</option>
@@ -295,7 +302,7 @@
 
       <!-- Lock & Master Super-Admin Buttons -->
       <button type="button" class="btn" style="background: rgba(255,255,255,0.1); padding: 6px 8px; color: #fff;" onclick="lockAppNow()">🔒</button>
-      <button type="button" class="btn" style="background: rgba(0,229,255,0.18); border: 1px solid #00e5ff; padding: 6px 8px; color: #00e5ff; font-size: 11px;" onclick="openSuperAdminModal()" id="btnHeaderAdmin">🛡️ المشرف</button>
+      <button type="button" class="btn" style="background: rgba(244,63,94,0.2); border: 1px solid #f43f5e; padding: 6px 8px; color: #f43f5e; font-size: 11px;" onclick="openSuperAdminModal()" id="btnHeaderAdmin">🛡️ المشرف</button>
     </div>
   </header>
 
@@ -313,7 +320,7 @@
     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
       <div class="glass-card">
         <p style="font-size: 11px; color: #94a3b8;" id="cardKpiTitle1">محطات العمل النشطة</p>
-        <h3 style="font-size: 22px; font-weight: 800; color: #00e5ff; margin-top: 4px;">42 / 50</h3>
+        <h3 style="font-size: 22px; font-weight: 800; color: #00e5ff; margin-top: 4px;" id="kpiActiveCount">42 / 50</h3>
         <span class="badge badge-success" style="margin-top: 6px;" id="cardKpiBadge1">● 96% استقرار</span>
       </div>
       <div class="glass-card">
@@ -468,30 +475,72 @@
     </button>
   </nav>
 
-  <!-- Super-Admin / Kill-Switch Modal (PIN: 9900) -->
+  <!-- نافذة متابعة وإدارة الشركات المشتركة (Multi-Tenant Management Modal) -->
+  <div id="tenantsModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 15px; font-weight: 800; color: #00e5ff;">🏢 إدارة الشركات المشتركة</h3>
+        <button type="button" onclick="closeModal('tenantsModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- إحصائيات الشركات -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; text-align: center;">
+        <div style="background: #050d25; border: 1px solid rgba(0,229,255,0.3); border-radius: 8px; padding: 6px;">
+          <div style="font-size: 9px; color: #94a3b8;">إجمالي الشركات</div>
+          <div style="font-size: 14px; font-weight: 800; color: #00e5ff;" id="statTotalTenants">3</div>
+        </div>
+        <div style="background: #050d25; border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: 6px;">
+          <div style="font-size: 9px; color: #94a3b8;">الشركات النشطة</div>
+          <div style="font-size: 14px; font-weight: 800; color: #4ade80;" id="statActiveTenants">2</div>
+        </div>
+        <div style="background: #050d25; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 6px;">
+          <div style="font-size: 9px; color: #94a3b8;">الشركات المجمدة</div>
+          <div style="font-size: 14px; font-weight: 800; color: #f87171;" id="statFrozenTenants">1</div>
+        </div>
+      </div>
+
+      <!-- قائمة الشركات المشتركة -->
+      <div id="tenantsListContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+        <!-- يتم توليدها آلياً عبر الجافاسكربت -->
+      </div>
+
+      <!-- زر إضافة شركة جديدة -->
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="btn btn-primary" style="flex: 1; padding: 10px; font-size: 12px;" onclick="addNewCompanyPrompt()">
+          + إضافة منشأة جديدة
+        </button>
+        <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 10px 14px; font-size: 12px;" onclick="closeModal('tenantsModal')">
+          إغلاق
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Super-Admin / Per-Company Kill-Switch Modal (PIN: 9900) -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h3 style="font-size: 16px; font-weight: 800; color: #00e5ff;">🛡️ خزينة المشرف (Master Vault)</h3>
+        <h3 style="font-size: 16px; font-weight: 800; color: #f43f5e;">🛡️ خزينة المشرف الأعلى (Super Vault)</h3>
         <button type="button" onclick="closeModal('adminModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
       <div id="adminLockState">
-        <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">أدخل رمز المشرف السري (رمز التجميد والتحكم):</p>
-        <input type="password" id="adminPinInput" placeholder="••••" style="width: 100%; background: #050d25; border: 1px solid rgba(0,229,255,0.4); border-radius: 10px; padding: 12px; color: #fff; text-align: center; font-size: 18px; outline: none;">
-        <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 12px;" onclick="verifyAdminPin()">التحقق من الصلاحية</button>
+        <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">أدخل رمز المشرف السري (رمز التجميد والتحكم المالي):</p>
+        <input type="password" id="adminPinInput" placeholder="••••" style="width: 100%; background: #050d25; border: 1px solid rgba(244,63,94,0.4); border-radius: 10px; padding: 12px; color: #fff; text-align: center; font-size: 18px; outline: none;">
+        <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff;" onclick="verifyAdminPin()">التحقق من الصلاحية</button>
       </div>
 
       <div id="adminPanelState" style="display: none;">
-        <div style="background: rgba(239,68,68,0.1); border: 1px solid #ef4444; border-radius: 10px; padding: 12px; margin-bottom: 12px;">
-          <h4 style="font-size: 12px; font-weight: bold; color: #f87171;">⚠️ مفتاح التجميد الفوري (Kill-Switch)</h4>
-          <button type="button" class="btn" style="background: #ef4444; color: #fff; width: 100%; margin-top: 8px; padding: 10px; font-size: 12px;" onclick="triggerKillSwitch()">
-            ⚡ تجميد ترخيص هذه المنشأة فوراً
-          </button>
+        <div style="font-size: 11px; font-weight: bold; color: #fca5a5; margin-bottom: 8px;">
+          ⚡ أزرار التجميد الفردي للشركات (Per-Tenant Kill-Switches):
         </div>
 
-        <div>
-          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">تغيير رمز الدخول الافتراضي:</label>
+        <div id="adminTenantsControlList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+          <!-- يتم توليد أزرار التجميد لكل شركة هنا -->
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+          <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px;">تغيير رمز الدخول الافتراضي (Master PIN):</label>
           <input type="text" id="newMasterPin" value="1234" style="width: 100%; background: #050d25; border: 1px solid rgba(0,229,255,0.3); border-radius: 8px; padding: 8px; color: #00e5ff; font-weight: bold; text-align: center;">
           <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 8px; font-size: 12px;" onclick="saveNewPin()">حفظ الرمز</button>
         </div>
@@ -520,200 +569,35 @@
     const masterSuperKey = "9900";
     let deferredPrompt = null;
 
-    // تسجيل الـ Service Worker لفتح تصريح التثبيت الآلي فوراً
+    // قاعدة بيانات الشركات المشتركة مع حالة الترخيص لكل شركة (Multi-Tenant State)
+    let companies = [
+      { id: "tenant_1", name: "المؤسسة الوطنية القابضة", seats: 42, maxSeats: 50, isFrozen: false, isCurrent: true },
+      { id: "tenant_2", name: "شركة الأفق للتقنيات والذكاء", seats: 28, maxSeats: 35, isFrozen: false, isCurrent: false },
+      { id: "tenant_3", name: "مجموعة الروابي للخدمات اللوجستية", seats: 15, maxSeats: 20, isFrozen: true, isCurrent: false }
+    ];
+
+    // تسجيل الـ Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('CEO-Pulse Service Worker Active:', reg.scope))
-          .catch(err => console.log('SW registration fallback:', err));
+          .then(reg => console.log('CEO-Pulse SW Registered:', reg.scope))
+          .catch(err => console.log('SW Note:', err));
       });
     }
 
-    // التقاط تصريح التثبيت النظامي
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      console.log('✅ CEO-Pulse ready for 1-click install');
     });
 
-    // تنفيذ التثبيت بنقرة واحدة حقيقية
     function executeInstallDirect() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User installed CEO-Pulse app!');
-          }
-          deferredPrompt = null;
-        });
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
       } else {
-        // للمتصفحات التي لا تدعم beforeinstallprompt مباشرة كفيفو
-        alert("📲 جاري تجهيز أيقونة التطبيق...\nمن شريط المتصفح، اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» لتظهر فوراً على شاشتك بملء الشاشة!");
+        alert("📲 جاري تثبيت التطبيق...\nمن خيارات المتصفح (⋮) أو زر المشاركة (⎋)، اختر: «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» لتظهر فوراً على شاشتك بملء الشاشة!");
       }
     }
-
-    // Currency Multipliers
-    const rates = {
-      SAR: 1, USD: 0.27, EUR: 0.25, AED: 0.98, QAR: 0.97,
-      KWD: 0.082, BHD: 0.10, OMR: 0.10, DZD: 36.2, MAD: 2.68,
-      EGP: 13.2, GBP: 0.21, CHF: 0.24, JPY: 40.5
-    };
-
-    // Dictionary for 8 languages
-    const i18n = {
-      ar: {
-        dir: 'rtl',
-        orgName: 'المؤسسة الوطنية القابضة',
-        subTitle: 'بوابة القيادة السيادية المشفرة',
-        btnClear: 'مسح', btnEnter: 'دخول', btnBypass: '⚡ فتح التطبيق والدخول المباشر (1234)',
-        adminBtn: '🛡️ المشرف', tickerCloud: 'سحابة باريس AWS (مشفرة E2EE)', tickerStatus: 'بث تليمتري حي ●',
-        kpiTitle1: 'محطات العمل النشطة', kpiBadge1: '● 96% استقرار',
-        kpiTitle2: 'معدل التركيز المؤسسي', kpiBadge2: '▲ مرتفع جداً',
-        secTelemetry: 'تليمتري محطات العمل اللحظي',
-        empAName: 'الموظف أ (الإدارة المالية)', empAStatus: 'نشط الآن', empAApp: 'البرنامج النشط: ERP Oracle Financials', empAFocus: 'ساعات التركيز: 4.8 س', empAScore: 'الإنتاجية: 98%',
-        empBName: 'الموظف ب (الموارد البشرية)', empBStatus: 'نشط الآن', empBApp: 'البرنامج النشط: ATS Resume Scanner', empBFocus: 'ساعات التركيز: 3.9 س', empBScore: 'الإنتاجية: 94%',
-        radarTitle: 'رادار كشف مخالفات السياسات', radarSub: 'متوافق مع ضوابط حوكمة البيانات NDMO و ISO-27001',
-        violTitle: 'محاولة نسخ ملفات مالية غير مصرحة', violSev: 'حرج', violStation: 'محطة: PC-FIN-04 • الوقت: منذ 10 دقائق', violAction: 'الإجراء: تم الحظر فورياً وإشعار الإدارة.',
-        hiringTitle: '🤖 فحص وتدقيق السير الذاتية بالذكاء الاصطناعي', hiringSub: 'ارفع السيرة الذاتية لتدقيق المؤهلات فورياً دون استهلاك ذاكرة الهاتف:', hiringUploadBtn: 'اضغط لرفع السيرة الذاتية (PDF/DOCX)',
-        deptTitle: 'أقسام وهيكلة الموظفين', addEmpBtn: '+ إضافة موظف', dept1: 'الإدارة المالية والمحاسبة', dept1Cnt: '12 موظفاً', dept2: 'الموارد البشرية والتوظيف', dept2Cnt: '8 موظفين',
-        dealsTitle: 'الصفقات والمكافآت التنفيذية', dealItem: 'صفقة التوريد السنوية', dealBonus: 'المكافأة التنفيذية:',
-        secTitle: '🛡️ حالة الترخيص السيادي',
-        nav: ['الرئيسية', 'المخالفات', 'التوظيف', 'الأقسام', 'الصفقات', 'الأمان']
-      },
-      en: {
-        dir: 'ltr',
-        orgName: 'National Holding Enterprise',
-        subTitle: 'Sovereign Encrypted Executive Gateway',
-        btnClear: 'Clear', btnEnter: 'Enter', btnBypass: '⚡ Instant Executive Access (1234)',
-        adminBtn: '🛡️ Admin', tickerCloud: 'Paris AWS Cloud (E2EE Encrypted)', tickerStatus: 'Live Telemetry ●',
-        kpiTitle1: 'Active Workstations', kpiBadge1: '● 96% Stability',
-        kpiTitle2: 'Enterprise Focus Rate', kpiBadge2: '▲ Peak Momentum',
-        secTelemetry: 'Real-Time Workstation Telemetry',
-        empAName: 'Employee A (Finance Dept)', empAStatus: 'Active Now', empAApp: 'Active App: ERP Oracle Financials', empAFocus: 'Focus: 4.8 hrs', empAScore: 'Productivity: 98%',
-        empBName: 'Employee B (Human Resources)', empBStatus: 'Active Now', empBApp: 'Active App: ATS Resume Scanner', empBFocus: 'Focus: 3.9 hrs', empBScore: 'Productivity: 94%',
-        radarTitle: 'AI Policy & Compliance Radar', radarSub: 'Conforming to NDMO & ISO-27001 Governance Standards',
-        violTitle: 'Unauthorized Financial Data Export Attempt', violSev: 'CRITICAL', violStation: 'Node: PC-FIN-04 • 10m ago', violAction: 'Action: Port blocked immediately, executive alert dispatched.',
-        hiringTitle: '🤖 AI Forensic Candidate Screening', hiringSub: 'Upload resume to analyze qualifications securely via cloud backend:', hiringUploadBtn: 'Click to Upload Resume (PDF/DOCX)',
-        deptTitle: 'Department Structure & Staff', addEmpBtn: '+ Add Employee', dept1: 'Financial & Accounting Division', dept1Cnt: '12 Staff', dept2: 'Human Resources & Talent', dept2Cnt: '8 Staff',
-        dealsTitle: 'High-Value Deals & Executive Bonuses', dealItem: 'Annual Enterprise Procurement Deal', dealBonus: 'Executive Bonus:',
-        secTitle: '🛡️ Sovereign License Integrity',
-        nav: ['Dashboard', 'Compliance', 'AI Hiring', 'Depts', 'Deals', 'Security']
-      },
-      fr: {
-        dir: 'ltr',
-        orgName: 'Holding National Souverain',
-        subTitle: 'Passerelle Exécutive Chiffrée Souveraine',
-        btnClear: 'Effacer', btnEnter: 'Entrer', btnBypass: '⚡ Accès Direct Exécutif (1234)',
-        adminBtn: '🛡️ Admin', tickerCloud: 'Cloud AWS Paris (Chiffré E2EE)', tickerStatus: 'Télémétrie en Direct ●',
-        kpiTitle1: 'Postes Actifs', kpiBadge1: '● 96% Stabilité',
-        kpiTitle2: 'Indice de Concentration', kpiBadge2: '▲ Très Élevé',
-        secTelemetry: 'Télémétrie des Postes en Temps Réel',
-        empAName: 'Employé A (Département Finance)', empAStatus: 'Actif', empAApp: 'App Active: ERP Oracle Financials', empAFocus: 'Focus: 4.8 h', empAScore: 'Productivité: 98%',
-        empBName: 'Employé B (Ressources Humaines)', empBStatus: 'Actif', empBApp: 'App Active: ATS Resume Scanner', empBFocus: 'Focus: 3.9 h', empBScore: 'Productivité: 94%',
-        radarTitle: 'Radar IA de Conformité et Politiques', radarSub: 'Conforme aux normes RGPD et ISO-27001',
-        violTitle: 'Tentative d’export de fichiers financiers', violSev: 'CRITIQUE', violStation: 'Poste: PC-FIN-04 • Il y a 10 min', violAction: 'Action: Port bloqué et alerte envoyée à la direction.',
-        hiringTitle: '🤖 Analyse IA Sécurisée de CV', hiringSub: 'Téléversez le CV pour audit automatique sans saturer le mobile:', hiringUploadBtn: 'Cliquer pour Téléverser le CV (PDF)',
-        deptTitle: 'Structure des Départements', addEmpBtn: '+ Ajouter Employé', dept1: 'Direction Financière & Comptabilité', dept1Cnt: '12 Employés', dept2: 'Ressources Humaines', dept2Cnt: '8 Employés',
-        dealsTitle: 'Affaires Stratégiques & Primes', dealItem: 'Contrat d’Approvisionnement Annuel', dealBonus: 'Prime Exécutive:',
-        secTitle: '🛡️ Licence Souveraine & Sécurité',
-        nav: ['Cockpit', 'Conformité', 'Recrutement', 'Départements', 'Primes', 'Sécurité']
-      },
-      es: {
-        dir: 'ltr',
-        orgName: 'Holding Nacional Corporativo',
-        subTitle: 'Portal Ejecutivo Cifrado Soberano',
-        btnClear: 'Borrar', btnEnter: 'Entrar', btnBypass: '⚡ Acceso Ejecutivo Inmediato (1234)',
-        adminBtn: '🛡️ Admin', tickerCloud: 'Nube AWS París (Cifrada E2EE)', tickerStatus: 'Telemetría en Vivo ●',
-        kpiTitle1: 'Estaciones Activas', kpiBadge1: '● 96% Estabilidad',
-        kpiTitle2: 'Tasa de Concentración', kpiBadge2: '▲ Muy Alta',
-        secTelemetry: 'Telemetría de Estaciones en Tiempo Real',
-        empAName: 'Empleado A (Finanzas)', empAStatus: 'Activo Ahora', empAApp: 'App Activa: ERP Oracle Financials', empAFocus: 'Enfoque: 4.8 h', empAScore: 'Productividad: 98%',
-        empBName: 'Empleado B (Recursos Humanos)', empBStatus: 'Activo Ahora', empBApp: 'App Activa: ATS Resume Scanner', empBFocus: 'Enfoque: 3.9 h', empBScore: 'Productividad: 94%',
-        radarTitle: 'Radar IA de Cumplimiento Normativo', radarSub: 'Conforme con ISO-27001 y protección de datos',
-        violTitle: 'Intento no autorizado de copia de datos', violSev: 'CRÍTICO', violStation: 'Nodo: PC-FIN-04 • Hace 10 min', violAction: 'Acción: Bloqueo inmediato y aviso a gerencia.',
-        hiringTitle: '🤖 Auditoría Forense de CV con IA', hiringSub: 'Suba el currículum para evaluar competencias en la nube:', hiringUploadBtn: 'Subir Currículum (PDF/DOCX)',
-        deptTitle: 'Departamentos y Personal', addEmpBtn: '+ Empleado', dept1: 'Administración Financiera', dept1Cnt: '12 Miembros', dept2: 'Recursos Humanos', dept2Cnt: '8 Miembros',
-        dealsTitle: 'Acuerdos Comerciales y Bonificaciones', dealItem: 'Contrato Anual de Suministro', dealBonus: 'Bono Ejecutivo:',
-        secTitle: '🛡️ Estado de Licencia Soberana',
-        nav: ['Inicio', 'Cumplimiento', 'Selección', 'Deptos', 'Acuerdos', 'Seguridad']
-      },
-      de: {
-        dir: 'ltr',
-        orgName: 'Nationale Holding Gesellschaft',
-        subTitle: 'Souveränes Verschlüsseltes Führungsportal',
-        btnClear: 'Löschen', btnEnter: 'Eingabe', btnBypass: '⚡ Sofortiger Zugang (1234)',
-        adminBtn: '🛡️ Admin', tickerCloud: 'Paris AWS Cloud (E2EE)', tickerStatus: 'Live-Telemetrie ●',
-        kpiTitle1: 'Aktive Arbeitsstationen', kpiBadge1: '● 96% Stabilität',
-        kpiTitle2: 'Unternehmensfokus', kpiBadge2: '▲ Sehr Hoch',
-        secTelemetry: 'Echtzeit-Telemetrie der Arbeitsstationen',
-        empAName: 'Mitarbeiter A (Finanzen)', empAStatus: 'Aktiv', empAApp: 'Aktive App: ERP Oracle Financials', empAFocus: 'Fokus: 4.8 h', empAScore: 'Produktivität: 98%',
-        empBName: 'Mitarbeiter B (Personalabteilung)', empBStatus: 'Aktiv', empBApp: 'Aktive App: ATS Resume Scanner', empBFocus: 'Fokus: 3.9 h', empBScore: 'Produktivität: 94%',
-        radarTitle: 'KI-Richtlinien- und Compliance-Radar', radarSub: 'Konform mit ISO-27001 Sicherheitsstandards',
-        violTitle: 'Unerlaubter Finanzdatenexport', violSev: 'KRITISCH', violStation: 'Station: PC-FIN-04 • Vor 10 Min', violAction: 'Aktion: Zugriff blockiert und Vorstand alarmiert.',
-        hiringTitle: '🤖 KI-Bewerberprüfung & CV-Scan', hiringSub: 'Laden Sie den Lebenslauf hoch für Cloud-Analyse:', hiringUploadBtn: 'Lebenslauf hochladen (PDF)',
-        deptTitle: 'Abteilungsstruktur', addEmpBtn: '+ Mitarbeiter', dept1: 'Finanz- und Rechnungswesen', dept1Cnt: '12 Mitarbeiter', dept2: 'Personalwesen', dept2Cnt: '8 Mitarbeiter',
-        dealsTitle: 'Deals & Leistungsboni', dealItem: 'Jährlicher Liefervertrag', dealBonus: 'Prämie:',
-        secTitle: '🛡️ Souveräner Lizenzstatus',
-        nav: ['Übersicht', 'Compliance', 'Recruiting', 'Abteilungen', 'Deals', 'Sicherheit']
-      },
-      zh: {
-        dir: 'ltr',
-        orgName: '国家控股集团',
-        subTitle: '主权加密高管决策系统',
-        btnClear: '清除', btnEnter: '进入', btnBypass: '⚡ 高管快捷登录 (1234)',
-        adminBtn: '🛡️ 管理员', tickerCloud: '巴黎 AWS 云节点 (E2EE加密)', tickerStatus: '实时遥测中 ●',
-        kpiTitle1: '活跃工作站', kpiBadge1: '● 96% 稳定性',
-        kpiTitle2: '企业专注度', kpiBadge2: '▲ 峰值运转',
-        secTelemetry: '实时工作站遥测中心',
-        empAName: '员工 A (财务部)', empAStatus: '正在活跃', empAApp: '运行应用: ERP Oracle Financials', empAFocus: '专注时长: 4.8 小时', empAScore: '效率指数: 98%',
-        empBName: '员工 B (人力资源部)', empBStatus: '正在活跃', empBApp: '运行应用: ATS Resume Scanner', empBFocus: '专注时长: 3.9 小时', empBScore: '效率指数: 94%',
-        radarTitle: 'AI 合规与违规监测雷达', radarSub: '符合 ISO-27001 数据治理标准',
-        violTitle: '未经授权导出财务文件尝试', violSev: '严重', violStation: '节点: PC-FIN-04 • 10分钟前', violAction: '措施: 已立刻封锁端口并上报管理层。',
-        hiringTitle: '🤖 AI 简历智能深度审计', hiringSub: '上传简历以通过云端深度匹配，不消耗手机内存:', hiringUploadBtn: '点击上传简历 (PDF/DOCX)',
-        deptTitle: '公司组织架构', addEmpBtn: '+ 新增员工', dept1: '财务与会计部', dept1Cnt: '12 人', dept2: '人力资源与招聘部', dept2Cnt: '8 人',
-        dealsTitle: '高管大单与绩效奖金', dealItem: '年度集团集采大单', dealBonus: '执行奖金:',
-        secTitle: '🛡️ 主权永久授权状态',
-        nav: ['仪表盘', '合规', '招聘', '部门', '交易', '安全']
-      },
-      ru: {
-        dir: 'ltr',
-        orgName: 'Национальный Холдинг',
-        subTitle: 'Суверенный зашифрованный исполнительный шлюз',
-        btnClear: 'Очистить', btnEnter: 'Войти', btnBypass: '⚡ Мгновенный вход CEO (1234)',
-        adminBtn: '🛡️ Админ', tickerCloud: 'Облако AWS Париж (E2EE шифрование)', tickerStatus: 'Телеметрия онлайн ●',
-        kpiTitle1: 'Активные станции', kpiBadge1: '● 96% стабильность',
-        kpiTitle2: 'Уровень фокуса', kpiBadge2: '▲ Высокий',
-        secTelemetry: 'Телеметрия рабочих станций в реальном времени',
-        empAName: 'Сотрудник А (Финансы)', empAStatus: 'Активен', empAApp: 'Активное ПО: ERP Oracle Financials', empAFocus: 'Фокус: 4.8 ч', empAScore: 'Продуктивность: 98%',
-        empBName: 'Сотрудник Б (Кадры)', empBStatus: 'Активен', empBApp: 'Активное ПО: ATS Resume Scanner', empBFocus: 'Фокус: 3.9 ч', empBScore: 'Продуктивность: 94%',
-        radarTitle: 'ИИ Радар Соответствия и Нарушений', radarSub: 'Соответствует стандартам ISO-27001',
-        violTitle: 'Попытка несанкционированного скачивания данных', violSev: 'КРИТИЧЕСКИЙ', violStation: 'Узел: PC-FIN-04 • 10 мин назад', violAction: 'Действие: Порт заблокирован, уведомлен CEO.',
-        hiringTitle: '🤖 ИИ Анализ и Скрининг Резюме', hiringSub: 'Загрузите резюме для безопасного облачного аудита:', hiringUploadBtn: 'Загрузить резюме (PDF/DOCX)',
-        deptTitle: 'Структура подразделений', addEmpBtn: '+ Сотрудник', dept1: 'Финансовый департамент', dept1Cnt: '12 чел', dept2: 'Департамент кадров', dept2Cnt: '8 чел',
-        dealsTitle: 'Крупные сделки и бонусы', dealItem: 'Годовой контракт на поставку', dealBonus: 'Бонус:',
-        secTitle: '🛡️ Суверенный статус лицензии',
-        nav: ['Главная', 'Нарушения', 'Рекрутинг', 'Отделы', 'Сделки', 'Защита']
-      },
-      tr: {
-        dir: 'ltr',
-        orgName: 'Ulusal Holding Kuruluşu',
-        subTitle: 'Egemen Şifreli Yönetici Portalı',
-        btnClear: 'Sil', btnEnter: 'Giriş', btnBypass: '⚡ Hızlı Yönetici Girişi (1234)',
-        adminBtn: '🛡️ Yönetici', tickerCloud: 'Paris AWS Bulutu (E2EE Şifreli)', tickerStatus: 'Canlı Telemetri ●',
-        kpiTitle1: 'Aktif İstasyonlar', kpiBadge1: '● %96 Kararlılık',
-        kpiTitle2: 'Kurumsal Odak Oranı', kpiBadge2: '▲ Çok Yüksek',
-        secTelemetry: 'Gerçek Zamanlı İstasyon Telemetrisi',
-        empAName: 'Çalışan A (Finans Departmanı)', empAStatus: 'Şimdi Aktif', empAApp: 'Aktif Uygulama: ERP Oracle Financials', empAFocus: 'Odak: 4.8 sa', empAScore: 'Verimlilik: %98',
-        empBName: 'Çalışan B (İnsan Kaynakları)', empBStatus: 'Şimdi Aktif', empBApp: 'Aktif Uygulama: ATS Resume Scanner', empBFocus: 'Odak: 3.9 sa', empBScore: 'Verimlilik: %94',
-        radarTitle: 'Yapay Zeka Politika ve Uyum Radarı', radarSub: 'ISO-27001 standartlarına tam uyumlu',
-        violTitle: 'İzinsiz Finansal Veri Çekme Girişimi', violSev: 'KRİTİK', violStation: 'Düğüm: PC-FIN-04 • 10 dk önce', violAction: 'İşlem: Port engellendi, yöneticiye bildirildi.',
-        hiringTitle: '🤖 Yapay Zeka ile CV İnceleme', hiringSub: 'Telefondan bellek harcamadan bulutta CV analizi:', hiringUploadBtn: 'CV Yüklemek İçin Tıklayın (PDF)',
-        deptTitle: 'Departman Yapısı ve Personel', addEmpBtn: '+ Çalışan Ekle', dept1: 'Mali İşler ve Muhasebe', dept1Cnt: '12 Personel', dept2: 'İnsan Kaynakları', dept2Cnt: '8 Personel',
-        dealsTitle: 'Büyük Anlaşmalar ve Primler', dealItem: 'Yıllık Tedarik Anlaşması', dealBonus: 'Yönetici Primi:',
-        secTitle: '🛡️ Egemen Lisans Durumu',
-        nav: ['Panel', 'Uyum', 'İşe Alım', 'Bölümler', 'Anlaşmalar', 'Güvenlik']
-      }
-    };
 
     // Keypad Logic
     function pressKey(num) {
@@ -739,6 +623,13 @@
       }
     }
     function verifyPin() {
+      const current = companies.find(c => c.isCurrent);
+      if (current && current.isFrozen) {
+        alert("🛑 ترخيص شركة (" + current.name + ") مجمد حالياً لعدم السداد!\nيرجى مراجعة إدارة المنظومة.");
+        clearPin();
+        return;
+      }
+
       if (enteredPin === correctPin) {
         unlockAppDirect();
       } else {
@@ -747,17 +638,18 @@
       }
     }
     function unlockAppDirect() {
-      const lock = document.getElementById("lockScreen");
-      if (lock) {
-        lock.style.setProperty('display', 'none', 'important');
+      const current = companies.find(c => c.isCurrent);
+      if (current && current.isFrozen) {
+        alert("🛑 ترخيص شركة (" + current.name + ") مجمد حالياً لعدم السداد!\nيرجى مراجعة إدارة المنظومة.");
+        return;
       }
+      const lock = document.getElementById("lockScreen");
+      if (lock) lock.style.setProperty('display', 'none', 'important');
     }
     function lockAppNow() {
       clearPin();
       const lock = document.getElementById("lockScreen");
-      if (lock) {
-        lock.style.setProperty('display', 'flex', 'important');
-      }
+      if (lock) lock.style.setProperty('display', 'flex', 'important');
     }
 
     // Tab Switching
@@ -771,6 +663,7 @@
     }
 
     // Currency Switcher
+    const rates = { SAR: 1, USD: 0.27, EUR: 0.25, AED: 0.98, QAR: 0.97, KWD: 0.082, BHD: 0.10, OMR: 0.10, DZD: 36.2, MAD: 2.68, EGP: 13.2, GBP: 0.21, CHF: 0.24, JPY: 40.5 };
     function changeCurrency(curr) {
       const rate = rates[curr] || 1;
       const d1 = (120000 * rate).toLocaleString(undefined, {maximumFractionDigits: 0});
@@ -781,15 +674,17 @@
       if (el2) el2.innerText = "+ " + b1 + " " + curr;
     }
 
-    // Real-time Translation
+    // Language Switcher
+    const i18n = {
+      ar: { dir: 'rtl', orgName: 'المؤسسة الوطنية القابضة', subTitle: 'بوابة القيادة السيادية المشفرة', btnClear: 'مسح', btnEnter: 'دخول', btnBypass: '⚡ فتح التطبيق والدخول المباشر (1234)', adminBtn: '🛡️ المشرف', tickerCloud: 'سحابة باريس AWS (مشفرة E2EE)', tickerStatus: 'بث تليمتري حي ●', kpiTitle1: 'محطات العمل النشطة', kpiBadge1: '● 96% استقرار', kpiTitle2: 'معدل التركيز المؤسسي', kpiBadge2: '▲ مرتفع جداً', secTelemetry: 'تليمتري محطات العمل اللحظي', empAName: 'الموظف أ (الإدارة المالية)', empAStatus: 'نشط الآن', empAApp: 'البرنامج النشط: ERP Oracle Financials', empAFocus: 'ساعات التركيز: 4.8 س', empAScore: 'الإنتاجية: 98%', empBName: 'الموظف ب (الموارد البشرية)', empBStatus: 'نشط الآن', empBApp: 'البرنامج النشط: ATS Resume Scanner', empBFocus: 'ساعات التركيز: 3.9 س', empBScore: 'الإنتاجية: 94%', radarTitle: 'رادار كشف مخالفات السياسات', radarSub: 'متوافق مع ضوابط حوكمة البيانات NDMO و ISO-27001', violTitle: 'محاولة نسخ ملفات مالية غير مصرحة', violSev: 'حرج', violStation: 'محطة: PC-FIN-04 • الوقت: منذ 10 دقائق', violAction: 'الإجراء: تم الحظر فورياً وإشعار الإدارة.', hiringTitle: '🤖 فحص وتدقيق السير الذاتية بالذكاء الاصطناعي', hiringSub: 'ارفع السيرة الذاتية لتدقيق المؤهلات فورياً دون استهلاك ذاكرة الهاتف:', hiringUploadBtn: 'اضغط لرفع السيرة الذاتية (PDF/DOCX)', deptTitle: 'أقسام وهيكلة الموظفين', addEmpBtn: '+ إضافة موظف', dept1: 'الإدارة المالية والمحاسبة', dept1Cnt: '12 موظفاً', dept2: 'الموارد البشرية والتوظيف', dept2Cnt: '8 موظفين', dealsTitle: 'الصفقات والمكافآت التنفيذية', dealItem: 'صفقة التوريد السنوية', dealBonus: 'المكافأة التنفيذية:', secTitle: '🛡️ حالة الترخيص السيادي', nav: ['الرئيسية', 'المخالفات', 'التوظيف', 'الأقسام', 'الصفقات', 'الأمان'] },
+      en: { dir: 'ltr', orgName: 'National Holding Enterprise', subTitle: 'Sovereign Encrypted Executive Gateway', btnClear: 'Clear', btnEnter: 'Enter', btnBypass: '⚡ Instant Executive Access (1234)', adminBtn: '🛡️ Admin', tickerCloud: 'Paris AWS Cloud (E2EE Encrypted)', tickerStatus: 'Live Telemetry ●', kpiTitle1: 'Active Workstations', kpiBadge1: '● 96% Stability', kpiTitle2: 'Enterprise Focus Rate', kpiBadge2: '▲ Peak Momentum', secTelemetry: 'Real-Time Workstation Telemetry', empAName: 'Employee A (Finance Dept)', empAStatus: 'Active Now', empAApp: 'Active App: ERP Oracle Financials', empAFocus: 'Focus: 4.8 hrs', empAScore: 'Productivity: 98%', empBName: 'Employee B (Human Resources)', empBStatus: 'Active Now', empBApp: 'Active App: ATS Resume Scanner', empBFocus: 'Focus: 3.9 hrs', empBScore: 'Productivity: 94%', radarTitle: 'AI Policy & Compliance Radar', radarSub: 'Conforming to NDMO & ISO-27001 Governance Standards', violTitle: 'Unauthorized Financial Data Export Attempt', violSev: 'CRITICAL', violStation: 'Node: PC-FIN-04 • 10m ago', violAction: 'Action: Port blocked immediately, executive alert dispatched.', hiringTitle: '🤖 AI Forensic Candidate Screening', hiringSub: 'Upload resume to analyze qualifications securely via cloud backend:', hiringUploadBtn: 'Click to Upload Resume (PDF/DOCX)', deptTitle: 'Department Structure & Staff', addEmpBtn: '+ Add Employee', dept1: 'Financial & Accounting Division', dept1Cnt: '12 Staff', dept2: 'Human Resources & Talent', dept2Cnt: '8 Staff', dealsTitle: 'High-Value Deals & Executive Bonuses', dealItem: 'Annual Enterprise Procurement Deal', dealBonus: 'Executive Bonus:', secTitle: '🛡️ Sovereign License Integrity', nav: ['Dashboard', 'Compliance', 'AI Hiring', 'Depts', 'Deals', 'Security'] }
+    };
+
     function changeLanguage(lang) {
       const dict = i18n[lang] || i18n['ar'];
       document.documentElement.lang = lang;
       document.documentElement.dir = dict.dir;
-
       const setT = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
-
-      setT('headerOrgName', dict.orgName);
       setT('lockSubTitle', dict.subTitle);
       setT('btnKeyClear', dict.btnClear);
       setT('btnKeyEnter', dict.btnEnter);
@@ -797,51 +692,149 @@
       setT('btnHeaderAdmin', dict.adminBtn);
       setT('tickerCloudText', dict.tickerCloud);
       setT('tickerStatusText', dict.tickerStatus);
-
       setT('cardKpiTitle1', dict.kpiTitle1);
       setT('cardKpiBadge1', dict.kpiBadge1);
       setT('cardKpiTitle2', dict.kpiTitle2);
       setT('cardKpiBadge2', dict.kpiBadge2);
       setT('secTelemetryTitle', dict.secTelemetry);
-
       setT('empAName', dict.empAName);
       setT('empAStatus', dict.empAStatus);
       setT('empAApp', dict.empAApp);
       setT('empAFocus', dict.empAFocus);
       setT('empAScore', dict.empAScore);
-
       setT('empBName', dict.empBName);
       setT('empBStatus', dict.empBStatus);
       setT('empBApp', dict.empBApp);
       setT('empBFocus', dict.empBFocus);
       setT('empBScore', dict.empBScore);
-
       setT('radarTitle', dict.radarTitle);
       setT('radarSub', dict.radarSub);
       setT('violationItemTitle', dict.violTitle);
       setT('violationItemSeverity', dict.violSev);
       setT('violationItemStation', dict.violStation);
       setT('violationItemAction', dict.violAction);
-
       setT('hiringTitle', dict.hiringTitle);
       setT('hiringSub', dict.hiringSub);
       setT('hiringUploadBtnText', dict.hiringUploadBtn);
-
       setT('deptMainTitle', dict.deptTitle);
       setT('btnOpenAddEmp', dict.addEmpBtn);
       setT('dept1Title', dict.dept1);
       setT('dept1Count', dict.dept1Cnt);
       setT('dept2Title', dict.dept2);
       setT('dept2Count', dict.dept2Cnt);
-
       setT('dealsMainTitle', dict.dealsTitle);
       setT('dealItemTitle', dict.dealItem);
       setT('dealBonusLabel', dict.dealBonus);
       setT('secTitle', dict.secTitle);
-
       for (let i = 0; i < 6; i++) {
         setT('navLbl' + (i + 1), dict.nav[i]);
       }
+    }
+
+    // إدارة الشركات المشتركة (Multi-Tenant Logic)
+    function renderTenantsUI() {
+      const container = document.getElementById("tenantsListContainer");
+      const adminContainer = document.getElementById("adminTenantsControlList");
+      if (!container) return;
+
+      container.innerHTML = "";
+      if (adminContainer) adminContainer.innerHTML = "";
+
+      let activeCount = 0;
+      let frozenCount = 0;
+
+      companies.forEach((comp) => {
+        if (comp.isFrozen) frozenCount++;
+        else activeCount++;
+
+        // 1. عنصر في نافذة استعراض الشركات
+        const div = document.createElement("div");
+        div.style.cssText = "background: #050d25; border: 1px solid " + (comp.isCurrent ? "#00e5ff" : (comp.isFrozen ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)")) + "; border-radius: 10px; padding: 10px; display: flex; justify-content: space-between; align-items: center;";
+        
+        div.innerHTML = `
+          <div>
+            <div style="font-size: 12px; font-weight: bold; color: #fff;">
+              ${comp.name} ${comp.isCurrent ? '<span style="font-size: 9px; background: #00e5ff; color: #050d25; padding: 1px 5px; border-radius: 4px; font-weight: 900;">الحالية</span>' : ''}
+            </div>
+            <div style="font-size: 10px; color: ${comp.isFrozen ? '#f87171' : '#4ade80'}; margin-top: 2px;">
+              ${comp.isFrozen ? '🛑 ترخيص مجمد (إيقاف مالي)' : '● نشطة • ' + comp.seats + ' محطة عمل'}
+            </div>
+          </div>
+          <div>
+            ${comp.isCurrent ? '<span style="font-size: 11px; color: #00e5ff; font-weight: bold;">معروضة</span>' : 
+              `<button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 5px 10px; font-size: 11px;" onclick="switchToCompany('${comp.id}')">تبديل</button>`}
+          </div>
+        `;
+        container.appendChild(div);
+
+        // 2. عنصر في نافذة تحكم المشرف (Kill-Switch لكل شركة على حدة)
+        if (adminContainer) {
+          const adminDiv = document.createElement("div");
+          adminDiv.style.cssText = "background: #050d25; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;";
+          adminDiv.innerHTML = `
+            <div>
+              <div style="font-size: 11px; font-weight: bold; color: #fff;">${comp.name}</div>
+              <div style="font-size: 9px; color: ${comp.isFrozen ? '#f87171' : '#4ade80'};">${comp.isFrozen ? 'مجمدة حالياً' : 'مرخصة ونشطة'}</div>
+            </div>
+            <button type="button" class="btn" style="padding: 5px 10px; font-size: 10px; font-weight: 800; background: ${comp.isFrozen ? 'rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e;' : 'rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444;'}" onclick="toggleCompanyFreeze('${comp.id}')">
+              ${comp.isFrozen ? '✓ فك التجميد' : '⚡ تجميد فوري'}
+            </button>
+          `;
+          adminContainer.appendChild(adminDiv);
+        }
+      });
+
+      document.getElementById("statTotalTenants").innerText = companies.length;
+      document.getElementById("statActiveTenants").innerText = activeCount;
+      document.getElementById("statFrozenTenants").innerText = frozenCount;
+    }
+
+    function openTenantsModal() {
+      renderTenantsUI();
+      openModal("tenantsModal");
+    }
+
+    function switchToCompany(id) {
+      const target = companies.find(c => c.id === id);
+      if (!target) return;
+
+      if (target.isFrozen) {
+        alert("⚠️ لا يمكن التبديل لشركة (" + target.name + ") لأن ترخيصها مجمد بواسطة المشرف!");
+        return;
+      }
+
+      companies.forEach(c => c.isCurrent = (c.id === id));
+      document.getElementById("headerOrgName").innerText = target.name;
+      document.getElementById("kpiActiveCount").innerText = target.seats + " / " + target.maxSeats;
+      renderTenantsUI();
+      closeModal("tenantsModal");
+      alert("✅ تم بنجاح التبديل إلى: " + target.name);
+    }
+
+    function toggleCompanyFreeze(id) {
+      const target = companies.find(c => c.id === id);
+      if (!target) return;
+
+      target.isFrozen = !target.isFrozen;
+      renderTenantsUI();
+
+      if (target.isFrozen) {
+        alert("🛑 تم فورياً تجميد ترخيص: " + target.name + "\nلن يتمكن موظفوها أو مديرها من فتح المنظومة حتى تسديد المستحقات!");
+        if (target.isCurrent) {
+          lockAppNow();
+        }
+      } else {
+        alert("✅ تم فك التجميد وإعادة تفعيل ترخيص: " + target.name + " بنجاح!");
+      }
+    }
+
+    function addNewCompanyPrompt() {
+      const name = prompt("أدخل اسم المنشأة / الشركة الجديدة للاشتراك:");
+      if (!name) return;
+      const newId = "tenant_" + (companies.length + 1);
+      companies.push({ id: newId, name: name, seats: 20, maxSeats: 25, isFrozen: false, isCurrent: false });
+      renderTenantsUI();
+      alert("🎉 تم تسجيل وترخيص شركة (" + name + ") بسحابة المنظومة بنجاح!");
     }
 
     function handleCvUpload(input) {
@@ -855,6 +848,7 @@
     }
 
     function openSuperAdminModal() {
+      renderTenantsUI();
       const m = document.getElementById("adminModal");
       const l = document.getElementById("adminLockState");
       const p = document.getElementById("adminPanelState");
@@ -884,35 +878,19 @@
         alert("الرمز يجب أن يتكون من 4 أرقام!");
       }
     }
-    function triggerKillSwitch() {
-      if (confirm("⚠️ هل أنت متأكد من تجميد ترخيص هذه المنشأة فورياً؟")) {
-        document.body.innerHTML = `
-          <div style="min-height: 100vh; background: #050d25; color: #f87171; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
-            <div style="font-size: 64px; margin-bottom: 16px;">🛑</div>
-            <h1 style="font-size: 24px; font-weight: 900; color: #fff;">تم تجميد الترخيص المؤسسي</h1>
-            <p style="color: #94a3b8; font-size: 13px; margin-top: 8px;">تم إيقاف تشغيل المنظومة لمراجعة الاشتراطات المالية.</p>
-          </div>
-        `;
-      }
-    }
 
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.add("active");
-    }
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove("active");
-    }
-    function openAddEmployeeModal() {
-      openModal("addEmpModal");
-    }
+    function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add("active"); }
+    function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove("active"); }
+    function openAddEmployeeModal() { openModal("addEmpModal"); }
     function saveEmployee() {
       const name = document.getElementById("empNameInput").value;
       if (!name) return alert("يرجى إدخال اسم الموظف!");
       alert("✅ تم بنجاح إضافة " + name);
       closeModal("addEmpModal");
     }
+
+    // Initial render
+    renderTenantsUI();
   </script>
 </body>
 </html>

@@ -104,6 +104,34 @@
       outline: none;
     }
 
+    /* Notification Bell with Badge */
+    .notif-btn {
+      position: relative;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: #00e5ff;
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .notif-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #f43f5e;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 900;
+      border-radius: 50%;
+      width: 15px;
+      height: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px #f43f5e;
+    }
+
     /* Tab Content */
     .tab-content { display: none; padding: 16px; }
     .tab-content.active { display: block; }
@@ -204,7 +232,7 @@
       border: 1px solid #00e5ff;
       border-radius: 18px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       padding: 22px;
       max-height: 85vh;
       overflow-y: auto;
@@ -250,7 +278,7 @@
     </div>
   </div>
 
-  <!-- Persistent Executive Header -->
+  <!-- Persistent Executive Header with Notification Bell -->
   <header>
     <div class="logo-box">
       <div class="shield-icon">⚡</div>
@@ -260,7 +288,13 @@
       </div>
     </div>
     <div class="controls">
-      <!-- زر الشركات المشتركة لعرض عددها وحالتها -->
+      <!-- زر إشعارات وقرارات المدير التنفيذي التفاعلي -->
+      <button type="button" class="notif-btn" onclick="openNotificationsModal()" title="إشعارات وقرارات المدير">
+        🔔
+        <span class="notif-badge" id="notifBadgeCount">3</span>
+      </button>
+
+      <!-- زر الشركات المشتركة -->
       <button type="button" class="btn" style="background: rgba(0,229,255,0.18); border: 1px solid rgba(0,229,255,0.4); color: #00e5ff; font-size: 11px; padding: 5px 8px;" onclick="openTenantsModal()" id="btnHeaderTenants">
         🏢 الشركات
       </button>
@@ -475,6 +509,75 @@
     </button>
   </nav>
 
+  <!-- نافذة إشعارات وقرارات المدير التنفيذي التفاعلية (Executive Notifications & Action Center) -->
+  <div id="notificationsModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🔔</span>
+          <h3 style="font-size: 15px; font-weight: 800; color: #00e5ff;" id="notifModalTitle">إشعارات وقرارات القيادة التنفيذية</h3>
+        </div>
+        <button type="button" onclick="closeModal('notificationsModal')" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;" id="notifListContainer">
+        <!-- إشعار 1: أمني حرج -->
+        <div class="glass-card" style="border-right: 4px solid #ef4444; background: rgba(239,68,68,0.08); padding: 12px; margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; font-size: 12px; color: #fca5a5;">🚨 تنبيه أمني حرج • PC-FIN-04</span>
+            <span style="font-size: 10px; color: #94a3b8;">منذ 5 د</span>
+          </div>
+          <p style="font-size: 11px; color: #cbd5e1; margin: 4px 0;">محاولة سحب كشوفات الرواتب عبر وحدة USB خارجية غير مصرحة.</p>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="btn" style="background: #ef4444; color: #fff; padding: 5px 12px; font-size: 11px;" onclick="handleNotifAction('تم قفل محطة PC-FIN-04 فورياً بنجاح!')">
+              🛑 حظر المحطة فوراً
+            </button>
+            <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 5px 10px; font-size: 11px;" onclick="handleNotifAction('تم إرسال إشعار استفسار لمسؤول المحطة.')">
+              استفسار
+            </button>
+          </div>
+        </div>
+
+        <!-- إشعار 2: مالي -->
+        <div class="glass-card" style="border-right: 4px solid #22c55e; background: rgba(34,197,94,0.08); padding: 12px; margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; font-size: 12px; color: #86efac;">💰 مكافأة صفقة جديدة تتطلب الاعتماد</span>
+            <span style="font-size: 10px; color: #94a3b8;">منذ 20 د</span>
+          </div>
+          <p style="font-size: 11px; color: #cbd5e1; margin: 4px 0;">الموظف أ يستحق مكافأة قدرها 6,000 SAR عن صفقة التوريد السنوية.</p>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="btn" style="background: #22c55e; color: #050d25; padding: 5px 14px; font-size: 11px; font-weight: 900;" onclick="handleNotifAction('تم اعتماد صرف مكافأة الموظف أ بنجاح!')">
+              ✓ اعتماد الصرف
+            </button>
+            <button type="button" class="btn" style="background: rgba(255,255,255,0.1); color: #fff; padding: 5px 10px; font-size: 11px;" onclick="handleNotifAction('تم تأجيل مراجعة المكافأة.')">
+              تأجيل
+            </button>
+          </div>
+        </div>
+
+        <!-- إشعار 3: توظيف -->
+        <div class="glass-card" style="border-right: 4px solid #00e5ff; background: rgba(0,229,255,0.08); padding: 12px; margin-bottom: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; font-size: 12px; color: #67e8f9;">🤖 توصية توظيف ذكية • م. أحمد</span>
+            <span style="font-size: 10px; color: #94a3b8;">منذ ساعة</span>
+          </div>
+          <p style="font-size: 11px; color: #cbd5e1; margin: 4px 0;">نسبة تطابق المؤهلات 96% لوظيفة كبير مهندسي السحاب (Paris Node).</p>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 11px;" onclick="handleNotifAction('تم تحويل المرشح لمرحلة المقابلة التنفيذية فوراً!')">
+              ⚡ مقابلة فورية
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px; text-align: center;">
+        <button type="button" class="btn" style="width: 100%; background: rgba(255,255,255,0.1); color: #fff; padding: 10px;" onclick="closeModal('notificationsModal')">
+          إغلاق نافذة الإشعارات
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- نافذة متابعة وإدارة الشركات المشتركة (Multi-Tenant Management Modal) -->
   <div id="tenantsModal" class="modal-overlay">
     <div class="modal-box">
@@ -595,6 +698,20 @@
       }
     }
 
+    // إدارة الإشعارات التنفيذية
+    function openNotificationsModal() {
+      openModal("notificationsModal");
+    }
+    function handleNotifAction(message) {
+      alert("⚡ [قرار تنفيذي فوري]:\n" + message);
+      const b = document.getElementById("notifBadgeCount");
+      if (b && parseInt(b.innerText) > 1) {
+        b.innerText = parseInt(b.innerText) - 1;
+      } else if (b) {
+        b.style.display = "none";
+      }
+    }
+
     // Keypad Logic
     function pressKey(num) {
       if (enteredPin.length < 4) {
@@ -680,6 +797,7 @@
         tenantsBtn: '🏢 الشركات',
         installBtn: '📲 تثبيت',
         adminBtn: '🛡️ المشرف',
+        notifTitle: 'إشعارات وقرارات القيادة التنفيذية',
         subTitle: 'بوابة القيادة السيادية المشفرة',
         btnClear: 'مسح', btnEnter: 'دخول', btnBypass: '⚡ فتح التطبيق والدخول المباشر (1234)',
         tickerCloud: 'سحابة باريس AWS (مشفرة E2EE)', tickerStatus: 'بث تليمتري حي ●',
@@ -704,6 +822,7 @@
         tenantsBtn: '🏢 Tenants',
         installBtn: '📲 Install',
         adminBtn: '🛡️ Admin',
+        notifTitle: 'Executive Alerts & Decision Engine',
         subTitle: 'Sovereign Encrypted Executive Gateway',
         btnClear: 'Clear', btnEnter: 'Enter', btnBypass: '⚡ Instant Executive Access (1234)',
         tickerCloud: 'Paris AWS Cloud (E2EE Encrypted)', tickerStatus: 'Live Telemetry ●',
@@ -728,6 +847,7 @@
         tenantsBtn: '🏢 Entreprises',
         installBtn: '📲 Installer',
         adminBtn: '🛡️ Admin',
+        notifTitle: 'Centre des Notifications et Décisions',
         subTitle: 'Passerelle Exécutive Chiffrée Souveraine',
         btnClear: 'Effacer', btnEnter: 'Entrer', btnBypass: '⚡ Accès Direct Exécutif (1234)',
         tickerCloud: 'Cloud AWS Paris (Chiffré E2EE)', tickerStatus: 'Télémétrie en Direct ●',
@@ -752,6 +872,7 @@
         tenantsBtn: '🏢 Empresas',
         installBtn: '📲 Instalar',
         adminBtn: '🛡️ Admin',
+        notifTitle: 'Centro de Alertas y Decisiones Ejecutivas',
         subTitle: 'Portal Ejecutivo Cifrado Soberano',
         btnClear: 'Borrar', btnEnter: 'Entrar', btnBypass: '⚡ Acceso Ejecutivo Inmediato (1234)',
         tickerCloud: 'Nube AWS París (Cifrada E2EE)', tickerStatus: 'Telemetría en Vivo ●',
@@ -776,6 +897,7 @@
         tenantsBtn: '🏢 Mandanten',
         installBtn: '📲 Installieren',
         adminBtn: '🛡️ Admin',
+        notifTitle: 'Führungswarnungen & Entscheidungszentrum',
         subTitle: 'Souveränes Verschlüsseltes Führungsportal',
         btnClear: 'Löschen', btnEnter: 'Eingabe', btnBypass: '⚡ Sofortiger Zugang (1234)',
         tickerCloud: 'Paris AWS Cloud (E2EE)', tickerStatus: 'Live-Telemetrie ●',
@@ -800,6 +922,7 @@
         tenantsBtn: '🏢 租户管理',
         installBtn: '📲 安装系统',
         adminBtn: '🛡️ 超级管理员',
+        notifTitle: '高管告警与实时决策中心',
         subTitle: '主权加密高管决策系统',
         btnClear: '清除', btnEnter: '进入', btnBypass: '⚡ 高管快捷登录 (1234)',
         tickerCloud: '巴黎 AWS 云节点 (E2EE加密)', tickerStatus: '实时遥测中 ●',
@@ -824,6 +947,7 @@
         tenantsBtn: '🏢 Компании',
         installBtn: '📲 Установить',
         adminBtn: '🛡️ Админ',
+        notifTitle: 'Центр уведомлений и решений CEO',
         subTitle: 'Суверенный зашифрованный исполнительный шлюз',
         btnClear: 'Очистить', btnEnter: 'Войти', btnBypass: '⚡ Мгновенный вход CEO (1234)',
         tickerCloud: 'Облако AWS Париж (E2EE шифрование)', tickerStatus: 'Телеметрия онлайн ●',
@@ -848,6 +972,7 @@
         tenantsBtn: '🏢 Şirketler',
         installBtn: '📲 Yükle',
         adminBtn: '🛡️ Yönetici',
+        notifTitle: 'Yönetici Bildirim ve Karar Merkezi',
         subTitle: 'Egemen Şifreli Yönetici Portalı',
         btnClear: 'Sil', btnEnter: 'Giriş', btnBypass: '⚡ Hızlı Yönetici Girişi (1234)',
         tickerCloud: 'Paris AWS Bulutu (E2EE Şifreli)', tickerStatus: 'Canlı Telemetri ●',
@@ -860,7 +985,7 @@
         violTitle: 'İzinsiz Finansal Veri Çekme Girişimi', violSev: 'KRİTİK', violStation: 'Düğüm: PC-FIN-04 • 10 dk önce', violAction: 'İşlem: Port engellendi, yöneticiye bildirildi.',
         hiringTitle: '🤖 Yapay Zeka ile CV İnceleme', hiringSub: 'Telefondan bellek harcamadan bulutta CV analizi:', hiringUploadBtn: 'CV Yüklemek İçin Tıklayın (PDF)',
         candidateVerdict: 'Karar: Derhal Mülakat Önerilir',
-        deptTitle: 'Departman Yapısı ve Personel', addEmpBtn: '+ Çalışan Ekle', dept1: 'Mali İşler ve Muhasebe', dept1Cnt: '12 Personel', dept2: 'İnsan Kaynakları', dept2Cnt: '8 Personel',
+        deptTitle: 'Departman Yapısı ve Personel', addEmpBtn: '+ Çalışan Ekle', dept1: 'Mali İşler ve Muhasebe', dept1Cnt: '12 Personel', dept2: 'İنسان Kaynakları', dept2Cnt: '8 Personel',
         dealsTitle: 'Büyük Anlaşmalar ve Primler', dealItem: 'Yıllık Tedarik Anlaşması', dealBonus: 'Yönetici Primi:',
         secTitle: '🛡️ Egemen Lisans Durumu',
         secDetails: '• Lisans Türü: <strong>Ömür Boyu Ticari Lisans (Perpetual)</strong><br>• Kayıt No: <code>CP-SOV-2025-9948-LIFETIME</code><br>• Şifreleme: <strong>Post-Kuantum Kyber-1024 E2EE</strong><br>• Altyapı: <strong>Paris AWS PostgreSQL Bulut Düğümü</strong>',
@@ -886,6 +1011,7 @@
       setT('btnHeaderTenants', dict.tenantsBtn);
       setT('btnHeaderInstall', dict.installBtn);
       setT('btnHeaderAdmin', dict.adminBtn);
+      setT('notifModalTitle', dict.notifTitle);
 
       setT('lockSubTitle', dict.subTitle);
       setT('btnKeyClear', dict.btnClear);
